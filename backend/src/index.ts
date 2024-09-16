@@ -5,7 +5,7 @@ import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 
 dotenv.config();
-//sync();
+sync();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;

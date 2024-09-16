@@ -17,12 +17,12 @@ export const sequelize: Sequelize = new Sequelize(
     host: DATABASE_HOST,
     port: parseInt(DATABASE_PORT),
     dialect: 'postgres',
-    dialectOptions: {
+    dialectOptions: NODE_ENV === 'production' ? {
       ssl: {
-        require: NODE_ENV === 'production',
-        rejectUnauthorized: NODE_ENV === 'production',
+        require: true,
+        rejectUnauthorized: false, // You can set this to true if the SSL certificate is authorized
       },
-    },
+    } : {},
   }
 );
 

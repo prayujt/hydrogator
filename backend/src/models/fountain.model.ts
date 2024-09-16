@@ -26,6 +26,6 @@ Fountain.init(
   },
   {
     sequelize,
-    tableName: 'Fountain',
+    tableName: 'fountains',
   }
 );
