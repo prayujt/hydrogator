@@ -4,6 +4,11 @@ import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { Link } from 'expo-router';
+import { NativeWindStyleSheet } from "nativewind";
+NativeWindStyleSheet.setOutput({
+  default: "native",
+});
 
 export default function HomeScreen() {
   return (
@@ -15,8 +20,8 @@ export default function HomeScreen() {
           style={styles.reactLogo}
         />
       }>
-    <View className="flex-1 items-center justify-center bg-white">
-      <Text className="text-white">Open up App.js to start working on your app!</Text>
+    <View className="flex-1 items-center justify-center">
+      <Link className="text-white" href={{ pathname: './(auth)/sign-in'}}>Sign in here</Link>
     </View>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Welcome!</ThemedText>
