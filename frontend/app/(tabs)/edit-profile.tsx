@@ -33,7 +33,7 @@ export default function EditProfileScreen() {
           value={email}
           onChangeText={setEmail}
           className="border border-gray-300 rounded px-3 py-2"
-          keyboardType="email-address"
+          inputMode="email"
           autoCapitalize="none"
         />
       </View>

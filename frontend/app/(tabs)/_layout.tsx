@@ -10,7 +10,7 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName: "home" | "home-outline" | "map" | "map-outline" | "person" | "person-outline" | "ellipse";
+          let iconName: "home" | "home-outline" | "map" | "map-outline" | "person" | "person-outline" | "ellipse" | "create" | "create-outline";
 
           if (route.name === "home") {
             iconName = focused ? "home" : "home-outline";
@@ -18,7 +18,10 @@ export default function TabsLayout() {
             iconName = focused ? "map" : "map-outline";
           } else if (route.name === "account") {
             iconName = focused ? "person" : "person-outline";
-          } else {
+          } else if (route.name == "edit-profile") {
+            iconName = focused ? "create" : "create-outline";
+          }
+          else {
             iconName = "ellipse";
           }
 
@@ -29,9 +32,24 @@ export default function TabsLayout() {
         headerShown: false,
       })}
     >
-      <Tabs.Screen name="home" options={{ title: "Home" }} />
+      <Tabs.Screen name="index" options={{ title: "Home" }} />
       <Tabs.Screen name="map" options={{ title: "Find Fountains" }} />
       <Tabs.Screen name="account" options={{ title: "Account" }} />
+      <Tabs.Screen name="edit-profile" options={{ title: "Edit Profile" }} />
+      <Tabs.Screen
+        name="explore"
+        options={{
+          title: "Explore",
+          tabBarButton: () => null, // Hides this tab from the bottom bar
+        }}
+      />
+      <Tabs.Screen
+        name="fountain/[id]"
+        options={{
+          title: "Fountain",
+          tabBarButton: () => null, // Hides this tab from the bottom bar
+        }}
+      />
     </Tabs>
   );
 }

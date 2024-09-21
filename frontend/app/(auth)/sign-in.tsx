@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable } from "react-native";
+import { View, Text, TextInput, Pressable, Alert } from "react-native";
 import { Link, useRouter } from "expo-router";
 
 export default function SignInScreen() {
@@ -7,11 +7,25 @@ export default function SignInScreen() {
   const [password, setPassword] = useState("");
   const router = useRouter();
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   const onSignIn = () => {
+    // Basic validation
+    if (!email || !password) {
+      Alert.alert("Error", "Please enter both email and password.");
+      return;
+    }
+
+     // Email format validation
+     if (!emailRegex.test(email)) {
+      Alert.alert("Error", "Please enter a valid email address.");
+      return;
+    }
+
     // TODO: Add authentication logic
-    // On successful sign-in, navigate to the main tabs
     router.replace("/(tabs)");
   };
+
 
   return (
     <View className="flex-1 bg-white justify-center px-6">
@@ -24,7 +38,7 @@ export default function SignInScreen() {
           value={email}
           onChangeText={setEmail}
           className="border border-gray-300 rounded px-3 py-2"
-          keyboardType="email-address"
+          inputMode="email"
           autoCapitalize="none"
         />
       </View>
@@ -42,6 +56,10 @@ export default function SignInScreen() {
 
       <Pressable onPress={onSignIn} className="bg-blue-500 rounded py-3 mb-4">
         <Text className="text-white text-center font-semibold">Sign In</Text>
+      </Pressable>
+
+      <Pressable onPress={() => router.push("./forgot-password")} className="mb-4">
+        <Text className="text-blue-500 text-center">Forgot your password?</Text>
       </Pressable>
 
       <Link href="./register">

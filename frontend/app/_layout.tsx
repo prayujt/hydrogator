@@ -12,7 +12,7 @@ export default function RootLayout() {
     // TODO: Replace with your authentication logic
     // For now, we assume user is not logged in
     if (isLoggedIn) {
-      router.replace("/(auth)/sign-in");
+      router.replace("./sign-in");
     }
   }, [isLoggedIn]);
 
