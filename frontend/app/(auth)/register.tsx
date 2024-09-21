@@ -1,12 +1,12 @@
-// app/(auth)/register.tsx
-
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, Alert } from "react-native";
+import { View, Text, TextInput, Pressable, Alert, TouchableOpacity } from "react-native";
 import { Link, useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons"; // For the eye icon
 
 export default function RegisterScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false); // Toggle password visibility
   const router = useRouter();
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -41,16 +41,25 @@ export default function RegisterScreen() {
 
       <View className="mb-6">
         <Text className="text-gray-700 mb-2">Password</Text>
-        <TextInput
-          placeholder="Enter your password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          className="border border-gray-300 rounded px-3 py-2"
-        />
+        <View className="flex-row items-center border border-gray-300 rounded px-3 py-2">
+          <TextInput
+            placeholder="Enter your password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!passwordVisible} // Toggle secureTextEntry based on visibility
+            className="flex-1"
+          />
+          <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+            <Ionicons
+              name={passwordVisible ? "eye-off" : "eye"}
+              size={24}
+              color="gray"
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <Pressable onPress={onRegister} className="bg-green-500 rounded py-3 mb-4">
+      <Pressable onPress={onRegister} className="bg-blue-500 rounded py-3 mb-4">
         <Text className="text-white text-center font-semibold">Register</Text>
       </Pressable>
 

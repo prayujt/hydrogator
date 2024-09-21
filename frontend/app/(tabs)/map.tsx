@@ -1,10 +1,23 @@
-// app/(tabs)/map.tsx
-
 import React, { useState, useEffect } from "react";
-import { View, ActivityIndicator, Alert, Text } from "react-native";
-// import MapView, { Marker } from "react-native-maps";
+import { View, ActivityIndicator, Alert, Text, Platform } from "react-native";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
+
+// Explicitly type MapboxGL for both web and native
+let MapboxGL: typeof import('@rnmapbox/maps') | typeof import('mapbox-gl');
+
+if (Platform.OS === "web") {
+  // Web-specific imports
+  const mapboxgl = require("mapbox-gl");
+  mapboxgl.accessToken = 'your-mapbox-access-token';
+  require('mapbox-gl/dist/mapbox-gl.css');
+  MapboxGL = mapboxgl;
+} else {
+  // Mobile-specific imports
+  const Mapbox = require("@rnmapbox/maps").default;
+  Mapbox.setAccessToken('your-mapbox-access-token');
+  MapboxGL = Mapbox;
+}
 
 export default function MapScreen() {
   const [location, setLocation] = useState<any>(null);
@@ -50,30 +63,33 @@ export default function MapScreen() {
     );
   }
 
-  const initialRegion = {
-    latitude: location.latitude,
-    longitude: location.longitude,
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01,
-  };
+  const initialCoordinates = [location.longitude, location.latitude];
 
   return (
     <View className="flex-1">
-      {/* <MapView
-        style={{ flex: 1 }}
-        initialRegion={initialRegion}
-        showsUserLocation={true}
-      >
-        {fountains.map((fountain) => (
-          <Marker
-            key={fountain.id}
-            coordinate={{ latitude: fountain.latitude, longitude: fountain.longitude }}
-            title={fountain.title}
-            description={fountain.description}
-            onCalloutPress={() => router.push(`/fountain/${fountain.id}`)}
+      {Platform.OS === "web" ? (
+        <div id="map" style={{ width: "100%", height: "100%" }} />
+      ) : (
+        <MapboxGL.MapView style={{ flex: 1 }} logoEnabled={false} zoomEnabled={true}>
+          <MapboxGL.Camera
+            zoomLevel={14}
+            centerCoordinate={initialCoordinates}
           />
-        ))}
-      </MapView> */}
+          <MapboxGL.UserLocation visible={true} showsUserHeadingIndicator={true} />
+          {fountains.map((fountain) => (
+            <MapboxGL.PointAnnotation
+              key={fountain.id}
+              id={fountain.id.toString()}
+              coordinate={[fountain.longitude, fountain.latitude]}
+              title={fountain.title}
+            >
+              <MapboxGL.Callout title={fountain.title}>
+                <Text>{fountain.description}</Text>
+              </MapboxGL.Callout>
+            </MapboxGL.PointAnnotation>
+          ))}
+        </MapboxGL.MapView>
+      )}
     </View>
   );
 }

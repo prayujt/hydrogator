@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, Alert } from "react-native";
+import { View, Text, TextInput, Pressable, Alert, TouchableOpacity } from "react-native";
 import { Link, useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons"; // For the eye icon
 
 export default function SignInScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false); // Password visibility state
   const router = useRouter();
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -16,8 +18,8 @@ export default function SignInScreen() {
       return;
     }
 
-     // Email format validation
-     if (!emailRegex.test(email)) {
+    // Email format validation
+    if (!emailRegex.test(email)) {
       Alert.alert("Error", "Please enter a valid email address.");
       return;
     }
@@ -25,7 +27,6 @@ export default function SignInScreen() {
     // TODO: Add authentication logic
     router.replace("/(tabs)");
   };
-
 
   return (
     <View className="flex-1 bg-white justify-center px-6">
@@ -45,13 +46,22 @@ export default function SignInScreen() {
 
       <View className="mb-6">
         <Text className="text-gray-700 mb-2">Password</Text>
-        <TextInput
-          placeholder="Enter your password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          className="border border-gray-300 rounded px-3 py-2"
-        />
+        <View className="flex-row items-center border border-gray-300 rounded px-3 py-2">
+          <TextInput
+            placeholder="Enter your password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!passwordVisible} // Toggle password visibility
+            className="flex-1"
+          />
+          <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+            <Ionicons
+              name={passwordVisible ? "eye-off" : "eye"}
+              size={24}
+              color="gray"
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <Pressable onPress={onSignIn} className="bg-blue-500 rounded py-3 mb-4">
