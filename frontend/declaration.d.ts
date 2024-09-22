@@ -1,0 +1,1 @@
+declare module '@env' { export const RNMAPBOX_API_KEY: string; }

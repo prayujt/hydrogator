@@ -31,7 +31,7 @@
       [
         "@rnmapbox/maps",
         {
-          "RNMapboxMapsDownloadToken": "sk.ey.."
+          "RNMapboxMapsImpl": "mapbox"
         }
       ],
       [

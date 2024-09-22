@@ -43,13 +43,13 @@ export default function TabsLayout() {
           tabBarButton: () => null, // Hides this tab from the bottom bar
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="fountain/[id]"
         options={{
           title: "Fountain",
           tabBarButton: () => null, // Hides this tab from the bottom bar
         }}
-      />
+      /> */}
     </Tabs>
   );
 }
