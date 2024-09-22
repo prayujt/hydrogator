@@ -1,6 +1,6 @@
-import { sequelize } from '../database';
+import { sequelize } from "../database";
 
-import { DataTypes, Model, Optional } from 'sequelize';
+import { DataTypes, Model } from "sequelize";
 
 export class Fountain extends Model {
   public id!: string;
@@ -26,6 +26,6 @@ Fountain.init(
   },
   {
     sequelize,
-    tableName: 'fountains',
-  }
+    tableName: "fountains",
+  },
 );
