@@ -1,5 +1,8 @@
 import { sequelize } from "../database";
 
+import { Fountain } from "./fountain.model";
+import { User } from "./user.model";
+
 import { DataTypes, Model } from "sequelize";
 
 export enum FilterStatus {
@@ -51,3 +54,6 @@ Review.init(
         tableName: "reviews",
     },
 );
+
+User.hasMany(Review, { foreignKey: "userId" });
+Fountain.hasMany(Review, { foreignKey: "fountainId" });
