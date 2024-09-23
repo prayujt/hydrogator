@@ -2,13 +2,22 @@ import {
     createFountain,
     getFountains,
 } from "./controllers/fountain.controller";
-import { sync } from "./database";
+
+import { Fountain } from "./models/fountain.model";
+import { Review } from "./models/review.model";
+import { User } from "./models/user.model";
 
 import express, { Express } from "express";
-import dotenv from "dotenv";
+import * as dotenv from "dotenv";
+
+const syncModels = async (): Promise<void> => {
+    await Fountain.sync();
+    await Review.sync();
+    await User.sync();
+};
 
 dotenv.config();
-sync();
+syncModels();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
