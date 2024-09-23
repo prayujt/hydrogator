@@ -1,12 +1,8 @@
-import { sequelize } from '../database';
+import { sequelize } from "../database";
 
-import { DataTypes, Model, Optional } from 'sequelize';
+import { DataTypes, Model } from "sequelize";
 
-export class Fountain extends Model {
-  public id!: string;
-  public longitude!: number;
-  public latitude!: number;
-}
+export class Fountain extends Model {}
 
 Fountain.init(
   {
@@ -23,9 +19,14 @@ Fountain.init(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
+    hasBottleFiller: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
   {
     sequelize,
-    tableName: 'fountains',
-  }
+    tableName: "fountains",
+  },
 );
