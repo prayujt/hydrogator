@@ -10,7 +10,7 @@ export default function AccountScreen() {
   const onSignOut = () => {
     // TODO: Handle sign-out logic
     // Navigate back to sign-in screen
-    router.replace("/(auth)/sign-in");
+    router.replace("/sign-in");
   };
 
   return (

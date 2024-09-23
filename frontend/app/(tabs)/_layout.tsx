@@ -1,27 +1,34 @@
 // app/(tabs)/_layout.tsx
 
-import React from "react";
+import React, { useState } from "react";
 import { Tabs } from "expo-router";
-import { Ionicons} from "@expo/vector-icons";
-import { View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+// Import your authentication hook or context
+// Replace with your actual auth hook or context
+// const user = false; // Set this to true or false to test
 
 export default function TabsLayout() {
+  const [user, userSignIn] = useState(false);
+  
   return (
     <Tabs
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName: "home" | "home-outline" | "map" | "map-outline" | "person" | "person-outline" | "ellipse" | "create" | "create-outline";
+          let iconName: React.ComponentProps<typeof Ionicons>["name"];
 
-          if (route.name === "home") {
+          if (route.name === "index") {
             iconName = focused ? "home" : "home-outline";
           } else if (route.name === "map") {
             iconName = focused ? "map" : "map-outline";
           } else if (route.name === "account") {
             iconName = focused ? "person" : "person-outline";
-          } else if (route.name == "edit-profile") {
+          } else if (route.name === "edit-profile") {
             iconName = focused ? "create" : "create-outline";
-          }
-          else {
+          } else if (route.name === "sign-in") {
+            iconName = focused ? "log-in" : "log-in-outline";
+          } else if (route.name === "register") {
+            iconName = focused ? "person-add" : "person-add-outline";
+          } else {
             iconName = "ellipse";
           }
 
@@ -32,24 +39,70 @@ export default function TabsLayout() {
         headerShown: false,
       })}
     >
-      <Tabs.Screen name="index" options={{ title: "Home" }} />
-      <Tabs.Screen name="map" options={{ title: "Find Fountains" }} />
-      <Tabs.Screen name="account" options={{ title: "Account" }} />
-      <Tabs.Screen name="edit-profile" options={{ title: "Edit Profile" }} />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "Home",
+        }}
+      />
+      <Tabs.Screen
+        name="map"
+        options={{
+          title: "Find Fountains",
+        }}
+      />
+
+        
+      <Tabs.Screen
+        name="sign-in"
+        options={{
+          title: "Sign In",
+          href: user ? null : "/sign-in",
+        }}
+      />
+      <Tabs.Screen
+        name="register"
+        options={{
+          title: "Register",
+          href: user ? null : "/register",
+        }}
+      />
+
+      <Tabs.Screen
+        name="account"
+        options={{
+          title: "Account",
+          href: user ? "/account" : null,
+
+        }}
+      />
+      <Tabs.Screen
+        name="edit-profile"
+        options={{
+          title: "Edit Profile",
+          href: user ? "/edit-profile" : null,
+        }}
+      />
+
+      {/* Hidden tabs */}
+      <Tabs.Screen
+        name="forgot-password"
+        options={{
+          href: null,
+        }}
+      />
       <Tabs.Screen
         name="explore"
         options={{
-          title: "Explore",
-          tabBarButton: () => null, // Hides this tab from the bottom bar
+          href: null,
         }}
       />
-      {/* <Tabs.Screen
+      <Tabs.Screen
         name="fountain/[id]"
         options={{
-          title: "Fountain",
-          tabBarButton: () => null, // Hides this tab from the bottom bar
+          href: null,
         }}
-      /> */}
+      />
     </Tabs>
   );
 }
