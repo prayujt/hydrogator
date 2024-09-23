@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize } from "sequelize";
 
 import {
   DATABASE_HOST,
@@ -7,7 +7,7 @@ import {
   DATABASE_PORT,
   DATABASE_USER,
   NODE_ENV,
-} from './vars';
+} from "./vars";
 
 export const sequelize: Sequelize = new Sequelize(
   DATABASE_NAME,
@@ -16,20 +16,19 @@ export const sequelize: Sequelize = new Sequelize(
   {
     host: DATABASE_HOST,
     port: parseInt(DATABASE_PORT),
-    dialect: 'postgres',
-    dialectOptions: NODE_ENV === 'production' ? {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false, // You can set this to true if the SSL certificate is authorized
-      },
-    } : {},
-  }
+    dialect: "postgres",
+    dialectOptions:
+      NODE_ENV === "production"
+        ? {
+            ssl: {
+              require: true,
+              rejectUnauthorized: false,
+            },
+          }
+        : {},
+  },
 );
 
 export const disconnect = (): void => {
   sequelize.close();
 };
-
-export const sync = async (): Promise<void> => {
-  await sequelize.sync();
-}
