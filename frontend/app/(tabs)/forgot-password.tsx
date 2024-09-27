@@ -37,7 +37,6 @@ export default function ForgotPasswordScreen() {
     const code = generateCode();
     setGeneratedCode(code);
     Alert.alert("Success", `A password reset code has been sent to your email. Code: ${code}`);
-    console.log(code);
     // Move to step 2 (enter code)
     setStep(2);
   };
@@ -72,6 +71,12 @@ export default function ForgotPasswordScreen() {
 
     Alert.alert("Success", "Your password has been reset.");
     router.replace("/(tabs)"); // Redirect to the login or home screen
+  };
+
+  const onGoBack = () => {
+    if (step > 1) {
+      setStep(step - 1)
+    }
   };
 
   return (
@@ -172,6 +177,10 @@ export default function ForgotPasswordScreen() {
           <Text className="text-white text-center font-semibold">Reset Password</Text>
         </Pressable>
       )}
+
+      <Pressable onPress={onGoBack} className="bg-gray-400 rounded py-3 mb-4">
+        <Text className="text-white text-center font-semibold">Go Back</Text>
+      </Pressable>
     </View>
   );
 }
