@@ -3,9 +3,6 @@
 import React, { useState } from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-// Import your authentication hook or context
-// Replace with your actual auth hook or context
-// const user = false; // Set this to true or false to test
 
 export default function TabsLayout() {
   const [user, userSignIn] = useState(false);

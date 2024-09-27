@@ -68,9 +68,9 @@ export default function SignInScreen() {
         <Text className="text-white text-center font-semibold">Sign In</Text>
       </Pressable>
 
-      <Pressable onPress={() => router.push("./forgot-password")} className="mb-4">
+      <Link href="./forgot-password" className="mb-4">
         <Text className="text-blue-500 text-center">Forgot your password?</Text>
-      </Pressable>
+      </Link>
 
       <Link href="./register">
         <Text className="text-blue-500 text-center">
