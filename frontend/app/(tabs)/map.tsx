@@ -2,8 +2,20 @@ import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { RNMAPBOX_API_KEY } from '@env';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import waterFountainData from '../water-fountain-locations.json';
 
 mapboxgl.accessToken = RNMAPBOX_API_KEY;
+
+type Fountain = {
+  floor: number;
+  description: string;
+};
+
+type Location = {
+  coordinates: number[];
+  building: string;
+  fountains: Fountain[];
+};
 
 export default function MapScreen() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -11,24 +23,12 @@ export default function MapScreen() {
 
   useEffect(() => {
     if (mapContainerRef.current) {
-
-      // Add markers for each water fountain location
-      const locations: {coordinates: [number, number], text: string}[] = [
-        { coordinates: [-82.347443, 29.646192], text: 'Reitz Union' },
-        { coordinates: [-82.3433, 29.6498], text: 'The Hub' },
-        { coordinates: [-82.3670, 29.6358], text: 'Southwest Recreation Center' },
-        { coordinates: [-82.3445, 29.6476], text: 'Marston Science Library' },
-        { coordinates: [-82.3420, 29.6515], text: 'Library West' },
-        { coordinates: [-82.3480, 29.6490], text: 'Little Hall' },
-      ];
-
-      // Initialize the map centered at a central point on UF campus
-      const centerCoordinates: [number, number] = [-82.3460, 29.6480];
+      const locations: Location[] = waterFountainData;
 
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: 'mapbox://styles/mapbox/streets-v12',
-        center: centerCoordinates,
+        center: [-82.3460, 29.6480],
         zoom: 15,
         antialias: true,
       });
@@ -51,13 +51,27 @@ export default function MapScreen() {
       // Add the GeolocateControl to the map
       map.addControl(geolocateControl);
 
-      // Add markers for each location
+
+      // Add location markers for the water fountains      
       locations.forEach((location) => {
+        const popupContent = `
+          <h3>${location.building}</h3>
+          <ul>
+            ${location.fountains
+              .map(
+                (fountain: { floor: any; description: any; }) =>
+                  `<li>Floor ${fountain.floor}: ${fountain.description}</li>`
+              )
+              .join('')}
+          </ul>
+        `;
         new mapboxgl.Marker({ color: 'red' })
-          .setLngLat(location.coordinates)
-          .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(location.text))
-          .addTo(map);
-      });
+        .setLngLat(location.coordinates)
+        .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupContent))
+        .addTo(map);
+    });
+    
+
 
       map.on('load', () => {
         // Trigger geolocation to center the map on the user's location
