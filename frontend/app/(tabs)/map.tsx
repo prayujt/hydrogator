@@ -2,7 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import { RNMAPBOX_API_KEY } from '@env';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import waterFountainData from '../water-fountain-locations.json';
+import waterFountainData from '../water-fountains.json';
+import '../MapScreen.css'; // Import the CSS file
 
 mapboxgl.accessToken = RNMAPBOX_API_KEY;
 
@@ -12,7 +13,7 @@ type Fountain = {
 };
 
 type Location = {
-  coordinates: number[];
+  coordinates: [number, number];
   building: string;
   fountains: Fountain[];
 };
@@ -23,14 +24,15 @@ export default function MapScreen() {
 
   useEffect(() => {
     if (mapContainerRef.current) {
-      const locations: Location[] = waterFountainData;
+      const locations: Location[] = waterFountainData as Location[];
 
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: 'mapbox://styles/mapbox/streets-v12',
         center: [-82.3460, 29.6480],
-        zoom: 15,
-        antialias: true,
+        zoom: 16,
+        pitch: 30,
+        antialias: true, // Enable anti-aliasing for smoother 3D rendering
       });
 
       mapRef.current = map;
@@ -51,15 +53,14 @@ export default function MapScreen() {
       // Add the GeolocateControl to the map
       map.addControl(geolocateControl);
 
-
       // Add location markers for the water fountains      
       locations.forEach((location) => {
         const popupContent = `
-          <h3>${location.building}</h3>
-          <ul>
+          <h3 class="popup-building">${location.building}</h3>
+          <ul class="popup-fountain-list">
             ${location.fountains
               .map(
-                (fountain: { floor: any; description: any; }) =>
+                (fountain: { floor: number; description: string }) =>
                   `<li>Floor ${fountain.floor}: ${fountain.description}</li>`
               )
               .join('')}
@@ -67,16 +68,22 @@ export default function MapScreen() {
         `;
         new mapboxgl.Marker({ color: 'red' })
         .setLngLat(location.coordinates)
-        .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupContent))
+        .setPopup(new mapboxgl.Popup({ offset: 25, className: 'custom-popup' }).setHTML(popupContent))
         .addTo(map);
-    });
+      });
     
-
+      geolocateControl.on('geolocate', () => {
+        // Set the pitch back to 60 degrees
+        map.easeTo({
+          pitch: 30,
+          zoom: 16,
+        });
+      });
 
       map.on('load', () => {
         // Trigger geolocation to center the map on the user's location
         geolocateControl.trigger();
-
+        
         // Insert the layer beneath any existing labels.
         const layers = map.getStyle().layers;
         const labelLayerId = layers?.find(
@@ -119,15 +126,6 @@ export default function MapScreen() {
           },
           labelLayerId
         );
-
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(e => 
-            map.flyTo({ 
-              center: [e.coords.longitude, e.coords.latitude],
-              zoom: 18,
-              pitch: 60
-            }))
-        }
       });
 
       // Clean up on unmount
