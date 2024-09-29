@@ -6,7 +6,6 @@ import {
   DATABASE_PASSWORD,
   DATABASE_PORT,
   DATABASE_USER,
-  NODE_ENV,
 } from "./vars";
 
 export const sequelize: Sequelize = new Sequelize(
