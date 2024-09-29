@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "module": "CommonJS",
+    "outDir": "./build",
     "target": "es6",
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -16,10 +18,9 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "rootDir": ".",
-    "outDir": "build",
     "removeComments": true
   },
   "include": [
-    "src/**/*",
+    "src/**/*"
   ]
 }
