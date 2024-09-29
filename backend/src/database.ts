@@ -17,15 +17,7 @@ export const sequelize: Sequelize = new Sequelize(
     host: DATABASE_HOST,
     port: parseInt(DATABASE_PORT),
     dialect: "postgres",
-    dialectOptions:
-      NODE_ENV === "production"
-        ? {
-            ssl: {
-              require: true,
-              rejectUnauthorized: false,
-            },
-          }
-        : {},
+    dialectOptions: {},
   },
 );
 
