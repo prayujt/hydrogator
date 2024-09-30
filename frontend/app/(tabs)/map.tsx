@@ -1,11 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
-import { RNMAPBOX_API_KEY } from '@env';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import waterFountainData from '../water-fountains.json';
 import '../MapScreen.css'; // Import the CSS file
 
-mapboxgl.accessToken = RNMAPBOX_API_KEY;
+mapboxgl.accessToken = process.env.EXPO_PUBLIC_RNMAPBOX_API_KEY as string;
 
 type Fountain = {
   floor: number;
