@@ -7,7 +7,8 @@ export class Fountain extends Model {}
 Fountain.init(
   {
     id: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
       primaryKey: true,
     },

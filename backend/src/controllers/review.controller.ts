@@ -8,7 +8,7 @@ export const getFountainReviews = async (
     const fountainId = req.params.id;
 
     const reviews = await Review.findAll({ where: { fountainId } });
-    return res.status(200).json({ reviews });
+    return res.status(200).json(reviews.map((review) => review.toJSON()));
 };
 
 export const createReview = async (
@@ -17,9 +17,9 @@ export const createReview = async (
 ): Promise<Response> => {
     const fountainId = req.params.id;
 
-    const review = Review.build({
+    const review = await Review.create({
         fountainId,
         ...req.body,
     });
-    return res.status(201).json({ review });
+    return res.status(201).json(review.toJSON());
 };

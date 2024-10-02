@@ -1,13 +1,15 @@
 import { sequelize } from "../database";
 
 import { DataTypes, Model } from "sequelize";
+import bcrypt from "bcrypt";
 
 export class User extends Model {}
 
 User.init(
     {
         id: {
-            type: DataTypes.STRING,
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
             allowNull: false,
             primaryKey: true,
         },
@@ -21,7 +23,7 @@ User.init(
         },
         name: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
         },
         username: {
             type: DataTypes.STRING,
@@ -33,3 +35,11 @@ User.init(
         tableName: "users",
     },
 );
+
+User.addHook("beforeCreate", async (user: User) => {
+    const saltRounds = 10;
+    user.setDataValue(
+        "password",
+        await bcrypt.hash(user.getDataValue("password"), saltRounds),
+    );
+});

@@ -10,6 +10,12 @@ import {
     createReview,
     getFountainReviews,
 } from "./controllers/review.controller";
+import {
+    register,
+    signIn,
+    generateForgotCode,
+    validateForgotCode,
+} from "./controllers/user.controller";
 
 import express, { Express } from "express";
 import * as dotenv from "dotenv";
@@ -25,6 +31,13 @@ syncModels();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
+
+app.use(express.json());
+
+app.post("/register", register);
+app.post("/signIn", signIn);
+app.post("/generateForgot", generateForgotCode);
+app.post("/validateForgot", validateForgotCode);
 
 app.get("/fountains", getFountains);
 app.post("/fountains", createFountain);
