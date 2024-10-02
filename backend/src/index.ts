@@ -1,6 +1,7 @@
 import { Fountain } from "./models/fountain.model";
 import { Review } from "./models/review.model";
 import { User } from "./models/user.model";
+import cors from "cors";
 
 import {
     createFountain,
@@ -31,6 +32,14 @@ syncModels();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
+
+const corsOptions = {
+    origin: 'http://localhost:8081', // Replace with your frontend's origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+  };
+  
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
