@@ -1,10 +1,16 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import waterFountainData from '../water-fountains.json';
-import '../MapScreen.css'; // Import the CSS file
+import '../MapScreen.css';
+import { useRouter } from 'expo-router';
+import BottomSheet, { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 
 mapboxgl.accessToken = process.env.EXPO_PUBLIC_RNMAPBOX_API_KEY as string;
+
+const screenHeight = Dimensions.get('window').height;
+const screenWidth = Dimensions.get('window').width;
 
 type Fountain = {
   floor: number;
@@ -21,6 +27,19 @@ export default function MapScreen() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const userLocationRef = useRef<[number, number] | null>(null);
+  const router = useRouter();
+
+  // Bottom Sheet
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+  const snapPoints = useMemo(() => {
+    if (selectedLocation) {
+      const contentLines = selectedLocation.fountains.length;
+      const minSnapPoint = Math.min(17 + contentLines * 5, 50);
+      return [`${minSnapPoint}%`, '75%'];
+    }
+    return ['25%', '75%'];
+  }, [selectedLocation]);
+
 
   useEffect(() => {
     if (mapContainerRef.current) {
@@ -69,26 +88,15 @@ export default function MapScreen() {
 
       // Add location markers for the water fountains      
       locations.forEach((location) => {
-        const popupContent = `
-          <h3 class="popup-building">${location.building}</h3>
-          <ul class="popup-fountain-list">
-            ${location.fountains
-              .map(
-                (fountain: { floor: number; description: string }) =>
-                  `<li>Floor ${fountain.floor}: ${fountain.description}</li>`
-              )
-              .join('')}
-          </ul>
-        `;
         const marker = new mapboxgl.Marker({ color: 'red' })
-        .setLngLat(location.coordinates)
-        .setPopup(
-          new mapboxgl.Popup({ offset: 25, className: 'custom-popup' }).setHTML(
-            popupContent
-          )
-        )
-        .addTo(map);
+          .setLngLat(location.coordinates)
+          .addTo(map);
 
+        marker.getElement().addEventListener('click', () => {
+          console.log('Marker clicked:', location); // Debugging log
+          setSelectedLocation(location); // Open bottom sheet with this location data
+        });
+        
         // Add click event listener to the marker
         marker.getElement().addEventListener('click', () => {
           if (userLocationRef.current) {
@@ -227,24 +235,75 @@ export default function MapScreen() {
       };
     }
   }, []);
-
-  // Center the map vertically
+  
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-      }}
-    >
-      <div
-        ref={mapContainerRef}
-        style={{
-          width: '100%',
-          height: '100vh',
-        }}
-      />
-    </div>
+    <BottomSheetModalProvider>
+      <View style={styles.container}>
+        <div
+          ref={mapContainerRef}
+          style={{ width: screenWidth, height: screenHeight, zIndex: 0 }}
+        />
+        {selectedLocation && (
+          <BottomSheet
+            index={0}
+            snapPoints={snapPoints}
+            onClose={() => setSelectedLocation(null)}
+            style={{ zIndex: 10 }}
+          >
+            <View style={styles.contentContainer}>
+              <TouchableOpacity style={styles.closeButton} onPress={() => setSelectedLocation(null)}>
+                <Text style={styles.closeButtonText}>×</Text>
+              </TouchableOpacity>
+
+              <Text style={styles.title}>{selectedLocation.building}</Text>
+              {selectedLocation.fountains.map((fountain, index) => (
+                <Text key={index} style={styles.fountainInfo} onPress={() => {
+                  router.push(`/water-fountain/${fountain.floor}`);
+                }}>
+                  Floor {fountain.floor}: {fountain.description}
+                </Text>
+              ))}
+            </View>
+          </BottomSheet>
+        )}
+      </View>
+    </BottomSheetModalProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 16,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  fountainInfo: {
+    fontSize: 14,
+    marginTop: 8,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    padding: 4,
+    backgroundColor: '#ff6347',
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+});

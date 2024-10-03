@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.3",
+    "@gorhom/bottom-sheet": "^4.6.4",
     "@mapbox/mapbox-sdk": "^0.16.1",
     "@react-navigation/native": "^6.0.2",
     "@rnmapbox/maps": "^10.1.31",

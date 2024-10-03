@@ -1,5 +1,3 @@
-// app/(tabs)/_layout.tsx
-
 import React, { useState } from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -95,7 +93,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="fountain/[id]"
+        name="water-fountain/[id]"
         options={{
           href: null,
         }}
