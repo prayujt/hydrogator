@@ -21,16 +21,12 @@ export const signIn = async (
     const { email, username, password } = req.body;
     if ((!email && !username) || !password) return res.sendStatus(400);
 
-    let user: User | null = null;
-    if (username) {
-        user = await User.findOne({
-            where: { username },
-        });
-    } else {
-        user = await User.findOne({
-            where: { email },
-        });
-    }
+    const user = await User.findOne({
+        where: {
+            ...(email && { email }),
+            ...(username && { username }),
+        },
+    });
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
     const valid = await bcrypt.compare(password, user.getDataValue("password"));
