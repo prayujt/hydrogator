@@ -41,7 +41,7 @@ export default function WaterFountainDetail() {
         </Text>
       ))} */}
       <Text> I am a water fountain</Text>
-      <Button title="Go Back" onPress={() => router.back()} />
+      <Button title="Go Back" onPress={() => router.push('/map')} />
     </View>
   );
 }

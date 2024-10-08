@@ -159,6 +159,10 @@ export default function MapScreen() {
                   map.fitBounds(bounds, {
                     padding: 50,
                   });
+                  map.easeTo({
+                    pitch: 30,
+                    bearing: 0,
+                  });
                 } else {
                   console.error('No route found');
                 }
