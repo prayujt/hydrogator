@@ -19,6 +19,8 @@ export default function ForgotPasswordScreen() {
   const [passwordVisible, setPasswordVisible] = useState(false); // Password visibility toggle
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false); // Confirm password visibility toggle
   const [step, setStep] = useState(1); // Track the current step
+  const [validResetCode, setValidResetCode] = useState(false); // Did the user submit the valid reset code
+
   const router = useRouter();
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -41,12 +43,15 @@ export default function ForgotPasswordScreen() {
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          email: email
+        }),
       });
   
       const data = await response.json();
   
       if (response.ok) {
-        showAlert("Success", `A password reset code has been sent to your email`);
+        showAlert("Success", data.message  || 'A password reset code has been sent to your email');
         setStep(2);
     } else {
         showAlert('Error', data.message || 'Could not send reset code');
@@ -70,7 +75,7 @@ export default function ForgotPasswordScreen() {
         },
         body: JSON.stringify({
           email: email,
-          password: password,
+          code: resetCode,
         }),
       });
   
@@ -78,16 +83,24 @@ export default function ForgotPasswordScreen() {
   
       if (response.ok) {
         showAlert("Success", `The correct reset code was entered`);
+        setValidResetCode(true);
         setStep(3);
     } else {
+        setValidResetCode(false);
         showAlert('Error', data.message || 'Could not validate the reset code');
       }
     } catch (error) {
+      setValidResetCode(false);
       showAlert('Error with backend server', 'An error occurred. Please try again.');
     }
   };
 
   const onSubmitNewPassword = () => {
+    if (!validResetCode) {
+      showAlert("Error", "Incorrect reset code was submitted.");
+      return;
+    }
+
     if (!password || !confirmPassword) {
       showAlert("Error", "Please enter both password fields.");
       return;
@@ -100,8 +113,8 @@ export default function ForgotPasswordScreen() {
 
     // TODO: Add logic to handle password reset
 
-    showAlert("Success", "Your password has been reset.");
-    router.replace("/sign-in"); // Redirect to the login or home screen
+    // showAlert("Success", "Your password has been reset.");
+    // router.replace("/sign-in");
   };
 
   const onGoBack = () => {
