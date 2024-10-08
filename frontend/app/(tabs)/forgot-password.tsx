@@ -1,12 +1,19 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, Alert, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, Pressable, Alert, TouchableOpacity, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons"; // For the eye icon
+
+const showAlert = (title: string, message: string) => {
+  if (Platform.OS === 'web') {
+    window.alert(`${title}: ${message}`);
+  } else {
+    Alert.alert(title, message);
+  }
+};
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
   const [resetCode, setResetCode] = useState("");
-  const [generatedCode, setGeneratedCode] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false); // Password visibility toggle
@@ -16,61 +23,85 @@ export default function ForgotPasswordScreen() {
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const generateCode = () => {
-    // Generate a random 6-digit code
-    return Math.floor(100000 + Math.random() * 900000).toString();
-  };
-
-  const onSubmitEmail = () => {
+  const onSubmitEmail = async () => {
     if (!email) {
-      Alert.alert("Error", "Please enter your email address.");
+      showAlert("Error", "Please enter your email address.");
       return;
     }
 
     // Email format validation
     if (!emailRegex.test(email)) {
-      Alert.alert("Error", "Please enter a valid email address.");
+      showAlert("Error", "Please enter a valid email address.");
       return;
     }
 
-    // Generate and save a reset code
-    const code = generateCode();
-    setGeneratedCode(code);
-    Alert.alert("Success", `A password reset code has been sent to your email. Code: ${code}`);
-    // Move to step 2 (enter code)
-    setStep(2);
+    try {
+      const response = await fetch('http://localhost:3000/generateForgot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        showAlert("Success", `A password reset code has been sent to your email`);
+        setStep(2);
+    } else {
+        showAlert('Error', data.message || 'Could not send reset code');
+      }
+    } catch (error) {
+      showAlert('Error with backend server', 'An error occurred. Please try again.');
+    }
   };
 
-  const onSubmitCode = () => {
+  const onSubmitCode = async () => {
     if (!resetCode) {
-      Alert.alert("Error", "Please enter the 6-digit reset code.");
+      showAlert("Error", "Please enter the 6-digit reset code.");
       return;
     }
 
-    if (resetCode !== generatedCode) {
-      Alert.alert("Error", "The code you entered is incorrect.");
-      return;
+    try {
+      const response = await fetch('http://localhost:3000/validateForgot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        showAlert("Success", `The correct reset code was entered`);
+        setStep(3);
+    } else {
+        showAlert('Error', data.message || 'Could not validate the reset code');
+      }
+    } catch (error) {
+      showAlert('Error with backend server', 'An error occurred. Please try again.');
     }
-
-    // Move to step 3 (enter new password)
-    setStep(3);
   };
 
   const onSubmitNewPassword = () => {
     if (!password || !confirmPassword) {
-      Alert.alert("Error", "Please enter both password fields.");
+      showAlert("Error", "Please enter both password fields.");
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match.");
+      showAlert("Error", "Passwords do not match.");
       return;
     }
 
     // TODO: Add logic to handle password reset
 
-    Alert.alert("Success", "Your password has been reset.");
-    router.replace("/(tabs)"); // Redirect to the login or home screen
+    showAlert("Success", "Your password has been reset.");
+    router.replace("/sign-in"); // Redirect to the login or home screen
   };
 
   const onGoBack = () => {

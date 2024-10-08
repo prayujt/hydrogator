@@ -1,7 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, Alert, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, Pressable, Alert, TouchableOpacity, Platform } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons"; // For the eye icon
+
+const showAlert = (title: string, message: string) => {
+  if (Platform.OS === 'web') {
+    window.alert(`${title}: ${message}`);
+  } else {
+    Alert.alert(title, message);
+  }
+};
 
 export default function RegisterScreen() {
   const [username, setUsername] = useState("");
@@ -55,14 +63,14 @@ export default function RegisterScreen() {
     setPassword(text);
   };
   
-  const onRegister = () => {
+  const onRegister = async () => {
     if (!emailRegex.test(email)) {
-      Alert.alert("Error", "Please enter a valid email address.");
+      showAlert("Error", "Please enter a valid email address.");
       return;
     }
 
     if (!passwordRegex.test(password)) {
-      Alert.alert(
+      showAlert(
         "Error",
         "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number."
       );
@@ -70,17 +78,40 @@ export default function RegisterScreen() {
     }
 
     if (!usernameRegex.test(username)) {
-      Alert.alert(
+      showAlert(
         "Error",
         "Username must be at least 8 characters and contain one uppercase letter, one lowercase letter, and one number."
       );
       return;
     }
 
-
-    // TODO: Add registration logic
-    // On successful registration, navigate to the main tabs
-    router.replace("/(tabs)");
+    try {
+      // Send POST request to the backend to register the user
+      const response = await fetch('http://localhost:3000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          username: username,
+          password: password,
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        // On successful registration, navigate to the main tabs
+        router.replace("/sign-in");
+      } else {
+        // Handle error response
+        showAlert('Error', data.message || 'Registration failed');
+      }
+    } catch (error) {
+      // Handle network or other errors
+      showAlert('Error', 'An error occurred while registering. Please try again.');
+    }
   };
 
   return (

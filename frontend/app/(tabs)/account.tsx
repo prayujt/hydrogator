@@ -1,16 +1,21 @@
-// app/(tabs)/account.tsx
-
 import React from "react";
 import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function AccountScreen() {
   const router = useRouter();
 
-  const onSignOut = () => {
-    // TODO: Handle sign-out logic
-    // Navigate back to sign-in screen
-    router.replace("/sign-in");
+  const onSignOut = async () => {
+    try {
+      // Remove the JWT token from AsyncStorage
+      await AsyncStorage.removeItem("token");
+  
+      // Navigate back to the sign-in screen
+      router.replace("/sign-in");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
 
   return (

@@ -1,9 +1,25 @@
-import React, { useState } from "react";
-import { Tabs } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { Tabs, useRootNavigationState  } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function TabsLayout() {
-  const [user, userSignIn] = useState(false);
+  const [user, setUser] = useState(false);
+  const navigationState = useRootNavigationState(); // Used to track route changes
+
+  const isUserSignedIn = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      setUser(!!token); // If token exists, set user to true; otherwise, false
+    } catch (error) {
+      console.error("Error checking user sign-in status:", error);
+    }
+  };
+
+  // Check token when navigation state changes
+  useEffect(() => {
+    isUserSignedIn();
+  }, [navigationState]);
   
   return (
     <Tabs

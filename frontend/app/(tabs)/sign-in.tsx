@@ -1,7 +1,16 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, Alert, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, Pressable, Alert, TouchableOpacity, Platform } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons"; // For the eye icon
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const showAlert = (title: string, message: string) => {
+  if (Platform.OS === 'web') {
+    window.alert(`${title}: ${message}`);
+  } else {
+    Alert.alert(title, message);
+  }
+};
 
 export default function SignInScreen() {
   const [email, setEmail] = useState("");
@@ -11,21 +20,49 @@ export default function SignInScreen() {
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const onSignIn = () => {
+  const onSignIn = async () => {
     // Basic validation
     if (!email || !password) {
-      Alert.alert("Error", "Please enter both email and password.");
+      showAlert("Error", "Please enter both email and password.");
       return;
     }
 
     // Email format validation
     if (!emailRegex.test(email)) {
-      Alert.alert("Error", "Please enter a valid email address.");
+      showAlert("Error", "Please enter a valid email address.");
       return;
     }
 
-    // TODO: Add authentication logic
-    router.replace("/(tabs)");
+    try {
+      const response = await fetch('http://localhost:3000/signIn', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        // On successful registration, navigate to the main tabs
+        console.log("Successfully signed in");
+        console.log(data);
+        // Store the JWT token securely
+        await AsyncStorage.setItem('token', data.token);
+
+        router.replace("/(tabs)");
+      } else {
+        // Handle error response
+        showAlert('Incorrect email or password', data.message || 'Registration failed');
+      }
+    } catch (error) {
+      // Handle network or other errors
+      showAlert('Error with backend server', 'An error occurred while registering. Please try again.');
+    }
   };
 
   return (
