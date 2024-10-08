@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET, SENDGRID_API_KEY } from "../vars";
+import { JWT_SECRET, SENDGRID_API_KEY, EMAIL } from "../vars";
 import { User } from "../models/user.model";
 import sgMail from '@sendgrid/mail';
 
@@ -16,7 +16,7 @@ const generateRandomCode = (): string => {
 const sendEmail = async (email: string, code: string) => {
     const msg = {
       to: email,
-      from: 'hydrogator.app@gmail.com',
+      from: EMAIL,
       subject: 'Your Password Reset Code',
       text: `Your 6-digit code is: ${code}`,
     };
