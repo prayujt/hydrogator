@@ -2,7 +2,6 @@ import { Building } from "./models/building.model"
 import { Fountain } from "./models/fountain.model";
 import { Review } from "./models/review.model";
 import { User } from "./models/user.model";
-import cors from "cors";
 
 import {
     createFountain,
@@ -16,10 +15,14 @@ import {
     signIn,
     generateForgotCode,
     validateForgotCode,
+    updateUser,
 } from "./controllers/user.controller";
+
+import { authMiddleware } from "./middleware";
 
 import express, { Express } from "express";
 import * as dotenv from "dotenv";
+import cors from "cors";
 
 const syncModels = async (): Promise<void> => {
     await Building.sync({ alter: true });
@@ -48,6 +51,7 @@ app.post("/register", register);
 app.post("/signIn", signIn);
 app.post("/generateForgot", generateForgotCode);
 app.post("/validateForgot", validateForgotCode);
+app.put('/profile', authMiddleware, updateUser);
 
 app.get("/fountain/:fountainId", getFountain);
 app.post("/fountain", createFountain);
