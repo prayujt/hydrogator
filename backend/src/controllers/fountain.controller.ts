@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
+
 import { Fountain } from "../models/fountain.model";
 import { Review } from "../models/review.model";
+
+import { AuthRequest } from "../middleware";
 
 export const createFountain = async (
     req: Request,
@@ -49,14 +52,15 @@ export const deleteFountain = async (
 
 
 export const createFountainReview = async (
-    req: Request,
+    req: AuthRequest,
     res: Response,
 ): Promise<Response> => {
     const fountainId = req.params.fountainId;
 
     const review = await Review.create({
-        fountainId,
         ...req.body,
+        fountainId,
+        userId: req.user.id,
     });
     return res.status(201).json(review.toJSON());
 };
