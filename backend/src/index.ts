@@ -1,3 +1,4 @@
+import { Building } from "./models/building.model"
 import { Fountain } from "./models/fountain.model";
 import { Review } from "./models/review.model";
 import { User } from "./models/user.model";
@@ -5,12 +6,11 @@ import cors from "cors";
 
 import {
     createFountain,
-    getFountains,
+    deleteFountain,
+    getFountain,
+    updateFountain,
+    createFountainReview,
 } from "./controllers/fountain.controller";
-import {
-    createReview,
-    getFountainReviews,
-} from "./controllers/review.controller";
 import {
     register,
     signIn,
@@ -22,9 +22,10 @@ import express, { Express } from "express";
 import * as dotenv from "dotenv";
 
 const syncModels = async (): Promise<void> => {
+    await Building.sync({ alter: true });
     await Fountain.sync({ alter: true });
-    await Review.sync({ alter: true });
     await User.sync({ alter: true });
+    await Review.sync({ alter: true });
 };
 
 dotenv.config();
@@ -34,9 +35,9 @@ const app: Express = express();
 const port = process.env.PORT || 3000;
 
 const corsOptions = {
-    origin: 'http://localhost:8081', // Replace with your frontend's origin
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
-    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+    origin: 'http://localhost:8081',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   };
   
 app.use(cors(corsOptions));
@@ -48,13 +49,12 @@ app.post("/signIn", signIn);
 app.post("/generateForgot", generateForgotCode);
 app.post("/validateForgot", validateForgotCode);
 
-app.get("/fountains", getFountains);
-app.post("/fountains", createFountain);
-app.put("/fountain/:id", createFountain);
-app.delete("/fountains/:id", createFountain);
+app.get("/fountain/:fountainId", getFountain);
+app.post("/fountain", createFountain);
+app.put("/fountain/:fountainId", updateFountain);
+app.delete("/fountain/:fountainId", deleteFountain);
 
-app.get("/fountains/:id/reviews", getFountainReviews);
-app.post("/fountains/:id/reviews", createReview);
+app.post("/fountains/:fountainId/reviews", createFountainReview);
 
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);

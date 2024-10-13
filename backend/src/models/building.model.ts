@@ -1,11 +1,10 @@
 import { sequelize } from "../database";
-import { Building } from "./building.model";
 
 import { DataTypes, Model } from "sequelize";
 
-export class Fountain extends Model {}
+export class Building extends Model {}
 
-Fountain.init(
+Building.init(
   {
     id: {
       type: DataTypes.UUID,
@@ -21,17 +20,13 @@ Fountain.init(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
-    hasBottleFiller: {
-      type: DataTypes.BOOLEAN,
+    floorCount: {
+      type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: false,
     },
   },
   {
     sequelize,
-    tableName: "fountains",
+    tableName: "buildings",
   },
 );
-
-Fountain.belongsTo(Building, { foreignKey: "buildingId" });
-Building.hasMany(Fountain, { foreignKey: "buildingId" });
