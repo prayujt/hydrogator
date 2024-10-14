@@ -116,7 +116,7 @@ export default function RegisterScreen() {
 
   return (
     <View className="flex-1 bg-white justify-center px-6">
-      <Text className="text-2xl font-bold text-center mb-8">Register</Text>
+      <Text className="text-3xl font-bold text-center mb-8">Register</Text>
 
       <View className="mb-4">
         <Text className="text-gray-700 mb-2">Username</Text>

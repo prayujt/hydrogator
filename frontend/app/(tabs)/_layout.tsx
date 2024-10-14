@@ -91,7 +91,7 @@ export default function TabsLayout() {
         name="edit-profile"
         options={{
           title: "Edit Profile",
-          href: user ? "/edit-profile" : null,
+          href: null,
         }}
       />
 
