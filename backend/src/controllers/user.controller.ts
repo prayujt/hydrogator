@@ -1,9 +1,11 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import sgMail from '@sendgrid/mail';
+
 import { JWT_SECRET, SENDGRID_API_KEY, EMAIL } from "../vars";
 import { User } from "../models/user.model";
-import sgMail from '@sendgrid/mail';
+import { AuthRequest } from "../middleware";
 
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -22,8 +24,7 @@ const sendEmail = async (email: string, code: string) => {
     };
   
     await sgMail.send(msg);
-  };
-
+};
 
 export const register = async (
     req: Request,
@@ -58,7 +59,9 @@ export const signIn = async (
     const valid = await bcrypt.compare(password, user.getDataValue("password"));
     if (!valid) return res.status(401).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign(user.toJSON(), JWT_SECRET, {
+    const userJson = user.toJSON();
+    delete userJson.password;
+    const token = jwt.sign(userJson, JWT_SECRET, {
         expiresIn: "96h",
     });
 
@@ -102,3 +105,14 @@ export const validateForgotCode = async (
         return res.status(400).json({ message: "Invalid code" });
     }
 };
+
+export const updateUser = async (
+    req: AuthRequest,
+    res: Response,
+): Promise<Response> => {
+    const user = await User.findByPk(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    await user.update(req.body);
+    return res.status(200).json(user.toJSON());
+}
