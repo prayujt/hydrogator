@@ -17,6 +17,13 @@ import {
     validateForgotCode,
     updateUser,
 } from "./controllers/user.controller";
+import {
+    getBuildings,
+    createBuilding,
+    // getFountain,
+    // updateFountain,
+    // deleteFountain
+} from "./controllers/building.controller";
 
 import { authMiddleware } from "./middleware";
 
@@ -59,6 +66,9 @@ app.put("/fountain/:fountainId", updateFountain);
 app.delete("/fountain/:fountainId", deleteFountain);
 
 app.post("/fountains/:fountainId/reviews", createFountainReview);
+
+app.get("/building", getBuildings);
+app.post("/building", createBuilding);
 
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);

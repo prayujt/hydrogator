@@ -95,7 +95,7 @@ export default function ForgotPasswordScreen() {
     }
   };
 
-  const onSubmitNewPassword = () => {
+  const onSubmitNewPassword = async () => {
     if (!validResetCode) {
       showAlert("Error", "Incorrect reset code was submitted.");
       return;
@@ -112,6 +112,32 @@ export default function ForgotPasswordScreen() {
     }
 
     // TODO: Add logic to handle password reset
+    try {
+      const response = await fetch('http://localhost:3000/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        showAlert("Success", `Your password was reset`);
+        setValidResetCode(true);
+        setStep(3);
+    } else {
+        setValidResetCode(false);
+        showAlert('Error', data.message || 'Could not reset your password');
+      }
+    } catch (error) {
+      setValidResetCode(false);
+      showAlert('Error with backend server', 'An error occurred. Please try again.');
+    }
 
     // showAlert("Success", "Your password has been reset.");
     // router.replace("/sign-in");
