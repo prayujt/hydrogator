@@ -1,3 +1,5 @@
+// AccountScreen.tsx
+
 import React from "react";
 import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
@@ -10,7 +12,7 @@ export default function AccountScreen() {
     try {
       // Remove the JWT token from AsyncStorage
       await AsyncStorage.removeItem("token");
-  
+
       // Navigate back to the sign-in screen
       router.replace("/sign-in");
     } catch (error) {

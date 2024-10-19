@@ -113,6 +113,24 @@ export const updateUser = async (
     const user = await User.findByPk(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    await user.update(req.body);
+    const { username, email, newPassword } = req.body;
+
+    // Validate data
+    if (username && typeof username !== 'string') {
+      return res.status(400).json({ message: "Invalid username" });
+    }
+    if (email && typeof email !== 'string') {
+      return res.status(400).json({ message: "Invalid email" });
+    }
+    if (newPassword && typeof newPassword !== 'string') {
+      return res.status(400).json({ message: "Invalid password" });
+    }
+
+    // Update user fields
+    if (username) user.username = username;
+    if (email) user.email = email;
+    if (newPassword) user.password =newPassword;
+
+    await user.save();
     return res.status(200).json(user.toJSON());
-}
+};

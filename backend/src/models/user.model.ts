@@ -3,7 +3,11 @@ import { sequelize } from "../database";
 import { DataTypes, Model } from "sequelize";
 import bcrypt from "bcrypt";
 
-export class User extends Model {}
+export class User extends Model {
+    username: any;
+    email: any;
+    password: any;
+}
 
 User.init(
     {
