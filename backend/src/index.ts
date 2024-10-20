@@ -1,4 +1,4 @@
-import { Building } from "./models/building.model"
+import { Building } from "./models/building.model";
 import { Fountain } from "./models/fountain.model";
 import { Review } from "./models/review.model";
 import { User } from "./models/user.model";
@@ -14,15 +14,13 @@ import {
     register,
     signIn,
     generateForgotCode,
+    resetPassword,
     validateForgotCode,
     updateUser,
 } from "./controllers/user.controller";
 import {
     getBuildings,
     createBuilding,
-    // getFountain,
-    // updateFountain,
-    // deleteFountain
 } from "./controllers/building.controller";
 
 import { authMiddleware } from "./middleware";
@@ -45,11 +43,11 @@ const app: Express = express();
 const port = process.env.PORT || 3000;
 
 const corsOptions = {
-    origin: 'http://localhost:8081',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  };
-  
+    origin: "http://localhost:8081",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+};
+
 app.use(cors(corsOptions));
 
 app.use(express.json());
@@ -58,7 +56,8 @@ app.post("/register", register);
 app.post("/signIn", signIn);
 app.post("/generateForgot", generateForgotCode);
 app.post("/validateForgot", validateForgotCode);
-app.put('/profile', authMiddleware, updateUser);
+app.post("/resetPassword", resetPassword);
+app.put("/profile", authMiddleware, updateUser);
 
 app.get("/fountain/:fountainId", getFountain);
 app.post("/fountain", createFountain);
