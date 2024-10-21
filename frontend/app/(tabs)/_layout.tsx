@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Tabs, useRootNavigationState  } from "expo-router";
+import { Tabs, useRootNavigationState } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -20,7 +20,7 @@ export default function TabsLayout() {
   useEffect(() => {
     isUserSignedIn();
   }, [navigationState]);
-  
+
   return (
     <Tabs
       screenOptions={({ route }) => ({
@@ -28,8 +28,6 @@ export default function TabsLayout() {
           let iconName: React.ComponentProps<typeof Ionicons>["name"];
 
           if (route.name === "index") {
-            iconName = focused ? "home" : "home-outline";
-          } else if (route.name === "map") {
             iconName = focused ? "map" : "map-outline";
           } else if (route.name === "account") {
             iconName = focused ? "person" : "person-outline";
@@ -54,16 +52,10 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: "Home",
-        }}
-      />
-      <Tabs.Screen
-        name="map"
-        options={{
-          title: "Find Fountains",
+          href: user ? "/" : null,
         }}
       />
 
-        
       <Tabs.Screen
         name="sign-in"
         options={{
@@ -71,6 +63,7 @@ export default function TabsLayout() {
           href: user ? null : "/sign-in",
         }}
       />
+
       <Tabs.Screen
         name="register"
         options={{
@@ -84,7 +77,6 @@ export default function TabsLayout() {
         options={{
           title: "Account",
           href: user ? "/account" : null,
-
         }}
       />
       <Tabs.Screen

@@ -52,6 +52,12 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 
+// error handling middleware
+app.use((err, _req, res, _next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: "Internal Server Error" });
+});
+
 app.post("/register", register);
 app.post("/signIn", signIn);
 app.post("/generateForgot", generateForgotCode);
@@ -66,8 +72,8 @@ app.delete("/fountain/:fountainId", deleteFountain);
 
 app.post("/fountains/:fountainId/reviews", createFountainReview);
 
-app.get("/building", getBuildings);
-app.post("/building", createBuilding);
+app.get("/buildings", getBuildings);
+app.post("/buildings", createBuilding);
 
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);

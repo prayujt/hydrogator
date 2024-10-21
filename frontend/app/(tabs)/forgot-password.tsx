@@ -1,10 +1,19 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, Alert, TouchableOpacity, Platform } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  Alert,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons"; // For the eye icon
+import { API_HOST } from "../../constants/vars";
 
 const showAlert = (title: string, message: string) => {
-  if (Platform.OS === 'web') {
+  if (Platform.OS === "web") {
     window.alert(`${title}: ${message}`);
   } else {
     Alert.alert(title, message);
@@ -38,26 +47,32 @@ export default function ForgotPasswordScreen() {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/generateForgot', {
-        method: 'POST',
+      const response = await fetch(`${API_HOST}/generateForgot`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: email
+          email: email,
         }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
-        showAlert("Success", data.message  || 'A password reset code has been sent to your email');
+        showAlert(
+          "Success",
+          data.message || "A password reset code has been sent to your email",
+        );
         setStep(2);
-    } else {
-        showAlert('Error', data.message || 'Could not send reset code');
+      } else {
+        showAlert("Error", data.message || "Could not send reset code");
       }
     } catch (error) {
-      showAlert('Error with backend server', 'An error occurred. Please try again.');
+      showAlert(
+        "Error with backend server",
+        "An error occurred. Please try again.",
+      );
     }
   };
 
@@ -68,30 +83,33 @@ export default function ForgotPasswordScreen() {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/validateForgot', {
-        method: 'POST',
+      const response = await fetch(`${API_HOST}/validateForgot`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: email,
           code: resetCode,
         }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         showAlert("Success", `The correct reset code was entered`);
         setValidResetCode(true);
         setStep(3);
-    } else {
+      } else {
         setValidResetCode(false);
-        showAlert('Error', data.message || 'Could not validate the reset code');
+        showAlert("Error", data.message || "Could not validate the reset code");
       }
     } catch (error) {
       setValidResetCode(false);
-      showAlert('Error with backend server', 'An error occurred. Please try again.');
+      showAlert(
+        "Error with backend server",
+        "An error occurred. Please try again.",
+      );
     }
   };
 
@@ -113,30 +131,33 @@ export default function ForgotPasswordScreen() {
 
     // TODO: Add logic to handle password reset
     try {
-      const response = await fetch('http://localhost:3000/profile', {
-        method: 'PUT',
+      const response = await fetch(`${API_HOST}/profile`, {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: email,
-          password: password
+          password: password,
         }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         showAlert("Success", `Your password was reset`);
         setValidResetCode(true);
         setStep(3);
-    } else {
+      } else {
         setValidResetCode(false);
-        showAlert('Error', data.message || 'Could not reset your password');
+        showAlert("Error", data.message || "Could not reset your password");
       }
     } catch (error) {
       setValidResetCode(false);
-      showAlert('Error with backend server', 'An error occurred. Please try again.');
+      showAlert(
+        "Error with backend server",
+        "An error occurred. Please try again.",
+      );
     }
 
     // showAlert("Success", "Your password has been reset.");
@@ -145,14 +166,18 @@ export default function ForgotPasswordScreen() {
 
   const onGoBack = () => {
     if (step > 1) {
-      setStep(step - 1)
+      setStep(step - 1);
     }
   };
 
   return (
     <View className="flex-1 bg-white justify-center px-6">
       <Text className="text-3xl font-bold text-center mb-8">
-        {step === 1 ? "Forgot Password" : step === 2 ? "Enter Reset Code" : "Reset Password"}
+        {step === 1
+          ? "Forgot Password"
+          : step === 2
+          ? "Enter Reset Code"
+          : "Reset Password"}
       </Text>
 
       {step === 1 && (
@@ -171,7 +196,9 @@ export default function ForgotPasswordScreen() {
 
       {step === 2 && (
         <View className="mb-6">
-          <Text className="text-gray-700 mb-2">Enter the 6-digit code sent to your email</Text>
+          <Text className="text-gray-700 mb-2">
+            Enter the 6-digit code sent to your email
+          </Text>
           <TextInput
             placeholder="Enter reset code"
             value={resetCode}
@@ -195,7 +222,9 @@ export default function ForgotPasswordScreen() {
                 secureTextEntry={!passwordVisible} // Toggle password visibility
                 className="flex-1"
               />
-              <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+              <TouchableOpacity
+                onPress={() => setPasswordVisible(!passwordVisible)}
+              >
                 <Ionicons
                   name={passwordVisible ? "eye-off" : "eye"}
                   size={24}
@@ -215,10 +244,17 @@ export default function ForgotPasswordScreen() {
                 secureTextEntry={!confirmPasswordVisible} // Toggle password visibility for confirm field
                 className="flex-1"
                 style={{
-                  color: password === confirmPassword || confirmPassword === "" ? "black" : "#bc1b13", // Change text color if passwords don't match
+                  color:
+                    password === confirmPassword || confirmPassword === ""
+                      ? "black"
+                      : "#bc1b13", // Change text color if passwords don't match
                 }}
               />
-              <TouchableOpacity onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}>
+              <TouchableOpacity
+                onPress={() =>
+                  setConfirmPasswordVisible(!confirmPasswordVisible)
+                }
+              >
                 <Ionicons
                   name={confirmPasswordVisible ? "eye-off" : "eye"}
                   size={24}
@@ -231,20 +267,33 @@ export default function ForgotPasswordScreen() {
       )}
 
       {step === 1 && (
-        <Pressable onPress={onSubmitEmail} className="bg-blue-500 rounded py-3 mb-4">
+        <Pressable
+          onPress={onSubmitEmail}
+          className="bg-blue-500 rounded py-3 mb-4"
+        >
           <Text className="text-white text-center font-semibold">Submit</Text>
         </Pressable>
       )}
 
       {step === 2 && (
-        <Pressable onPress={onSubmitCode} className="bg-blue-500 rounded py-3 mb-4">
-          <Text className="text-white text-center font-semibold">Submit Code</Text>
+        <Pressable
+          onPress={onSubmitCode}
+          className="bg-blue-500 rounded py-3 mb-4"
+        >
+          <Text className="text-white text-center font-semibold">
+            Submit Code
+          </Text>
         </Pressable>
       )}
 
       {step === 3 && (
-        <Pressable onPress={onSubmitNewPassword} className="bg-blue-500 rounded py-3 mb-4">
-          <Text className="text-white text-center font-semibold">Reset Password</Text>
+        <Pressable
+          onPress={onSubmitNewPassword}
+          className="bg-blue-500 rounded py-3 mb-4"
+        >
+          <Text className="text-white text-center font-semibold">
+            Reset Password
+          </Text>
         </Pressable>
       )}
 

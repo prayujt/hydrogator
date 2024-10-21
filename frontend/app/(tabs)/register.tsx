@@ -1,10 +1,19 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, Alert, TouchableOpacity, Platform } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  Alert,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 import { Link, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons"; // For the eye icon
+import { API_HOST } from "../../constants/vars";
 
 const showAlert = (title: string, message: string) => {
-  if (Platform.OS === 'web') {
+  if (Platform.OS === "web") {
     window.alert(`${title}: ${message}`);
   } else {
     Alert.alert(title, message);
@@ -13,15 +22,15 @@ const showAlert = (title: string, message: string) => {
 
 export default function RegisterScreen() {
   const [username, setUsername] = useState("");
-  const [usernameError, setUsernameError] = useState('');
+  const [usernameError, setUsernameError] = useState("");
 
   const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState('');
+  const [emailError, setEmailError] = useState("");
 
   const [password, setPassword] = useState("");
-  const [passwordError, setPasswordError] = useState('');
+  const [passwordError, setPasswordError] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false); // Toggle password visibility
-  
+
   const router = useRouter();
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -29,40 +38,38 @@ export default function RegisterScreen() {
   const usernameRegex = /^[a-zA-Z0-9_-]{3,20}$/;
 
   const validateUsername = (text: string) => {
-    // Alphanumeric, underscores, and dashes, between 3-20 characters    
+    // Alphanumeric, underscores, and dashes, between 3-20 characters
     if (!usernameRegex.test(text)) {
       setUsernameError(
-        'Username must be between 3 and 20 alphanumeric characters.'
+        "Username must be between 3 and 20 alphanumeric characters.",
       );
     } else {
-      setUsernameError('');
+      setUsernameError("");
     }
     setUsername(text);
   };
 
   const validateEmail = (text: string) => {
     if (!emailRegex.test(text)) {
-      setEmailError(
-        'Enter a valid email address.'
-      );
+      setEmailError("Enter a valid email address.");
     } else {
-      setEmailError('');
+      setEmailError("");
     }
     setEmail(text);
   };
 
   const validatePassword = (text: string) => {
-   // At least 8 characters, one uppercase letter, one lowercase letter, and one number
+    // At least 8 characters, one uppercase letter, one lowercase letter, and one number
     if (!passwordRegex.test(text)) {
       setPasswordError(
-        'Password must be between 8 and 20 characters and contain one uppercase letter, one lowercase letter, and one number.'
+        "Password must be between 8 and 20 characters and contain one uppercase letter, one lowercase letter, and one number.",
       );
     } else {
-      setPasswordError('');
+      setPasswordError("");
     }
     setPassword(text);
   };
-  
+
   const onRegister = async () => {
     if (!emailRegex.test(email)) {
       showAlert("Error", "Please enter a valid email address.");
@@ -72,7 +79,7 @@ export default function RegisterScreen() {
     if (!passwordRegex.test(password)) {
       showAlert(
         "Error",
-        "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number."
+        "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number.",
       );
       return;
     }
@@ -80,17 +87,17 @@ export default function RegisterScreen() {
     if (!usernameRegex.test(username)) {
       showAlert(
         "Error",
-        "Username must be at least 8 characters and contain one uppercase letter, one lowercase letter, and one number."
+        "Username must be at least 8 characters and contain one uppercase letter, one lowercase letter, and one number.",
       );
       return;
     }
 
     try {
       // Send POST request to the backend to register the user
-      const response = await fetch('http://localhost:3000/register', {
-        method: 'POST',
+      const response = await fetch(`${API_HOST}/register`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: email,
@@ -98,19 +105,22 @@ export default function RegisterScreen() {
           password: password,
         }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         // On successful registration, navigate to the main tabs
         router.replace("/sign-in");
       } else {
         // Handle error response
-        showAlert('Error', data.message || 'Registration failed');
+        showAlert("Error", data.message || "Registration failed");
       }
     } catch (error) {
       // Handle network or other errors
-      showAlert('Error', 'An error occurred while registering. Please try again.');
+      showAlert(
+        "Error",
+        "An error occurred while registering. Please try again.",
+      );
     }
   };
 
@@ -127,7 +137,9 @@ export default function RegisterScreen() {
           className="border border-gray-300 rounded px-3 py-2"
           autoCapitalize="none"
         />
-            {usernameError ? <Text className="text-red-500">{usernameError}</Text> : null}
+        {usernameError ? (
+          <Text className="text-red-500">{usernameError}</Text>
+        ) : null}
       </View>
 
       <View className="mb-6">
@@ -153,7 +165,9 @@ export default function RegisterScreen() {
             secureTextEntry={!passwordVisible} // Toggle secureTextEntry based on visibility
             className="flex-1"
           />
-          <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+          <TouchableOpacity
+            onPress={() => setPasswordVisible(!passwordVisible)}
+          >
             <Ionicons
               name={passwordVisible ? "eye-off" : "eye"}
               size={24}
@@ -161,7 +175,9 @@ export default function RegisterScreen() {
             />
           </TouchableOpacity>
         </View>
-        {passwordError ? <Text className="text-red-500">{passwordError}</Text> : null}
+        {passwordError ? (
+          <Text className="text-red-500">{passwordError}</Text>
+        ) : null}
       </View>
 
       <Pressable onPress={onRegister} className="bg-blue-500 rounded py-3 mb-4">

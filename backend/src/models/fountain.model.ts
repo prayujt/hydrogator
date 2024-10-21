@@ -33,5 +33,5 @@ Fountain.init(
   },
 );
 
-Fountain.belongsTo(Building, { foreignKey: "buildingId" });
-Building.hasMany(Fountain, { foreignKey: "buildingId" });
+Fountain.belongsTo(Building, { as: "building", foreignKey: "buildingId" });
+Building.hasMany(Fountain, { as: "fountains", foreignKey: "buildingId" });

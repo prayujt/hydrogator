@@ -1,11 +1,21 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, Alert, TouchableOpacity, Platform } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  Alert,
+  TouchableOpacity,
+  Platform,
+} from "react-native";
 import { Link, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons"; // For the eye icon
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { API_HOST } from "../../constants/vars";
 
 const showAlert = (title: string, message: string) => {
-  if (Platform.OS === 'web') {
+  if (Platform.OS === "web") {
     window.alert(`${title}: ${message}`);
   } else {
     Alert.alert(title, message);
@@ -34,34 +44,40 @@ export default function SignInScreen() {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/signIn', {
-        method: 'POST',
+      const response = await fetch(`${API_HOST}/signIn`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: email,
-          password: password
+          password: password,
         }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         // On successful registration, navigate to the main tabs
         console.log("Successfully signed in");
         console.log(data);
         // Store the JWT token securely
-        await AsyncStorage.setItem('token', data.token);
+        await AsyncStorage.setItem("token", data.token);
 
         router.replace("/(tabs)");
       } else {
         // Handle error response
-        showAlert('Incorrect email or password', data.message || 'Registration failed');
+        showAlert(
+          "Incorrect email or password",
+          data.message || "Registration failed",
+        );
       }
     } catch (error) {
       // Handle network or other errors
-      showAlert('Error with backend server', 'An error occurred while registering. Please try again.');
+      showAlert(
+        "Error with backend server",
+        "An error occurred while registering. Please try again.",
+      );
     }
   };
 
@@ -88,10 +104,12 @@ export default function SignInScreen() {
             placeholder="Enter your password"
             value={password}
             onChangeText={setPassword}
-            secureTextEntry={!passwordVisible} // Toggle password visibility
+            secureTextEntry={!passwordVisible}
             className="flex-1"
           />
-          <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+          <TouchableOpacity
+            onPress={() => setPasswordVisible(!passwordVisible)}
+          >
             <Ionicons
               name={passwordVisible ? "eye-off" : "eye"}
               size={24}

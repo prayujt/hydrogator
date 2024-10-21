@@ -56,5 +56,5 @@ Review.init(
     },
 );
 
-User.hasMany(Review, { foreignKey: "userId" });
-Fountain.hasMany(Review, { foreignKey: "fountainId" });
+User.hasMany(Review, { as: "reviews", foreignKey: "userId" });
+Fountain.hasMany(Review, { as: "reviews", foreignKey: "fountainId" });

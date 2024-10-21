@@ -12,9 +12,10 @@ import {
   Platform,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_HOST } from "../../constants/vars";
 
 const showAlert = (title: string, message: string) => {
-  if (Platform.OS === 'web') {
+  if (Platform.OS === "web") {
     window.alert(`${title}: ${message}`);
   } else {
     Alert.alert(title, message);
@@ -77,7 +78,7 @@ export default function EditProfileScreen() {
   const saveProfile = async () => {
     setLoading(true);
     let validPassword = false;
-  
+
     try {
       // Validate password fields if the user is attempting to change the password
       if (showPasswordFields && newPassword) {
@@ -88,14 +89,14 @@ export default function EditProfileScreen() {
         }
         validPassword = true;
       }
-  
+
       // Determine if username or email have changed
       // const usernameHasChanged = username !== originalUsername;
       // const emailHasChanged = email !== originalEmail;
-  
+
       // Build the request body with only the fields that have changed or are valid
       const bodyData: BodyData = {};
-  
+
       // if (usernameHasChanged) {
       if (username.length > 0 && username.length < 4) {
         showAlert("Error", "Please enter a username larger than 3 characters");
@@ -103,36 +104,35 @@ export default function EditProfileScreen() {
       } else if (username.length > 3) {
         bodyData.username = username;
       }
-  
 
-      if (email.length > 0 &&!emailRegex.test(email)) {
+      if (email.length > 0 && !emailRegex.test(email)) {
         showAlert("Error", "Please enter a valid email address.");
         return;
-      } else if (email.length > 0){
+      } else if (email.length > 0) {
         bodyData.email = email;
       }
-  
+
       if (validPassword) {
         bodyData.newPassword = newPassword;
       }
-  
+
       // Check if there are any fields to update
       if (Object.keys(bodyData).length === 0) {
         showAlert("No changes detected", "Please make changes before saving.");
         setLoading(false);
         return;
       }
-  
+
       // Make the API call to update the profile
-      const profileResponse = await fetch("http://localhost:3000/profile", {
+      const profileResponse = await fetch(`${API_HOST}/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${userToken}`,
+          Authorization: `Bearer ${userToken}`,
         },
         body: JSON.stringify(bodyData),
       });
-  
+
       console.log(JSON.stringify(bodyData));
       console.log(userToken);
 
@@ -142,9 +142,9 @@ export default function EditProfileScreen() {
         setLoading(false);
         return;
       }
-  
+
       showAlert("Success", "Profile updated!");
-  
+
       // Update original values to the new ones
       // if (usernameHasChanged) {
       //   setOriginalUsername(username);
@@ -152,7 +152,7 @@ export default function EditProfileScreen() {
       // if (emailHasChanged) {
       //   setOriginalEmail(email);
       // }
-  
+
       // Clear password fields after successful update
       setNewPassword("");
       setConfirmPassword("");
@@ -169,11 +169,17 @@ export default function EditProfileScreen() {
       <Text className="text-3xl font-bold mb-6 text-center">Edit Profile</Text>
 
       {loading && (
-        <ActivityIndicator size="large" color="#0000ff" style={{ marginBottom: 20 }} />
+        <ActivityIndicator
+          size="large"
+          color="#0000ff"
+          style={{ marginBottom: 20 }}
+        />
       )}
 
       <View className="mb-6">
-        <Text className="text-gray-800 mb-2 text-base font-medium">Username</Text>
+        <Text className="text-gray-800 mb-2 text-base font-medium">
+          Username
+        </Text>
         <TextInput
           value={username}
           onChangeText={setUsername}
@@ -206,7 +212,9 @@ export default function EditProfileScreen() {
       {showPasswordFields && (
         <View>
           <View className="mb-6">
-            <Text className="text-gray-800 mb-2 text-base font-medium">New Password</Text>
+            <Text className="text-gray-800 mb-2 text-base font-medium">
+              New Password
+            </Text>
             <TextInput
               placeholder="Enter your new password"
               value={newPassword}
@@ -217,7 +225,9 @@ export default function EditProfileScreen() {
           </View>
 
           <View className="mb-8">
-            <Text className="text-gray-800 mb-2 text-base font-medium">Confirm New Password</Text>
+            <Text className="text-gray-800 mb-2 text-base font-medium">
+              Confirm New Password
+            </Text>
             <TextInput
               placeholder="Confirm your new password"
               value={confirmPassword}
