@@ -12,6 +12,10 @@ Building.init(
       allowNull: false,
       primaryKey: true,
     },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     longitude: {
       type: DataTypes.FLOAT,
       allowNull: false,

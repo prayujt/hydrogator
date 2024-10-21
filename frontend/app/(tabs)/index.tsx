@@ -20,15 +20,13 @@ import waterFountainData from "../water-fountains.json";
 import "../MapScreen.css";
 
 import { API_HOST } from "../../constants/vars";
+/* import type { Fountain, Building } from "../../types"; */
 
 mapboxgl.accessToken = process.env.EXPO_PUBLIC_RNMAPBOX_API_KEY as string;
 
 NativeWindStyleSheet.setOutput({
   default: "native",
 });
-
-const screenHeight = Dimensions.get("window").height;
-const screenWidth = Dimensions.get("window").width;
 
 type Fountain = {
   floor: number;
@@ -40,6 +38,9 @@ type Location = {
   building: string;
   fountains: Fountain[];
 };
+
+const screenHeight = Dimensions.get("window").height;
+const screenWidth = Dimensions.get("window").width;
 
 export default function MapScreen() {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);

@@ -30,10 +30,10 @@ import * as dotenv from "dotenv";
 import cors from "cors";
 
 const syncModels = async (): Promise<void> => {
-    await Building.sync({ alter: true });
-    await Fountain.sync({ alter: true });
-    await User.sync({ alter: true });
-    await Review.sync({ alter: true });
+    await Building.sync();
+    await Fountain.sync();
+    await User.sync();
+    await Review.sync();
 };
 
 dotenv.config();
