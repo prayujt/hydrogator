@@ -129,15 +129,14 @@ export default function ForgotPasswordScreen() {
       return;
     }
 
-    // TODO: Add logic to handle password reset
     try {
-      const response = await fetch(`${API_HOST}/profile`, {
-        method: "PUT",
+      const response = await fetch(`${API_HOST}/resetPassword`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: email,
+          code: resetCode,
           password: password,
         }),
       });
@@ -160,8 +159,9 @@ export default function ForgotPasswordScreen() {
       );
     }
 
-    // showAlert("Success", "Your password has been reset.");
-    // router.replace("/sign-in");
+    showAlert("Success", "Your password has been reset.");
+    console.log(password);
+    router.replace("/sign-in");
   };
 
   const onGoBack = () => {
