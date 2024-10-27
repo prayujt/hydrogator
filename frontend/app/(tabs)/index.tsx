@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-import { NativeWindStyleSheet } from "nativewind";
 import { useRouter } from "expo-router";
 
 import BottomSheet, { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
@@ -23,10 +22,6 @@ import { API_HOST } from "../../constants/vars";
 /* import type { Fountain, Building } from "../../types"; */
 
 mapboxgl.accessToken = process.env.EXPO_PUBLIC_RNMAPBOX_API_KEY as string;
-
-NativeWindStyleSheet.setOutput({
-  default: "native",
-});
 
 type Fountain = {
   floor: number;
@@ -50,7 +45,7 @@ export default function MapScreen() {
 
   // Bottom Sheet
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(
-    null,
+    null
   );
   const snapPoints = useMemo(() => {
     if (selectedLocation) {
@@ -79,7 +74,7 @@ export default function MapScreen() {
       // Add navigation control (zoom and rotation controls)
       map.addControl(
         new mapboxgl.NavigationControl({ visualizePitch: true }),
-        "top-right",
+        "top-right"
       );
 
       // Create a reference to the GeolocateControl
@@ -165,15 +160,13 @@ export default function MapScreen() {
 
                   // Adjust the map view to fit the route
                   const coordinates = route.coordinates;
-                  const bounds = coordinates.reduce(
-                    function (
-                      bounds: mapboxgl.LngLatBounds,
-                      coord: [number, number],
-                    ) {
-                      return bounds.extend(coord);
-                    },
-                    new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]),
-                  );
+                  const bounds = coordinates.reduce(function (
+                    bounds: mapboxgl.LngLatBounds,
+                    coord: [number, number]
+                  ) {
+                    return bounds.extend(coord);
+                  },
+                  new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
 
                   map.fitBounds(bounds, {
                     padding: 50,
@@ -211,7 +204,7 @@ export default function MapScreen() {
         // Insert the layer beneath any existing labels.
         const layers = map.getStyle().layers;
         const labelLayerId = layers?.find(
-          (layer) => layer.type === "symbol" && layer.layout?.["text-field"],
+          (layer) => layer.type === "symbol" && layer.layout?.["text-field"]
         )?.id;
 
         // Add 3D buildings layer
@@ -248,7 +241,7 @@ export default function MapScreen() {
               "fill-extrusion-opacity": 0.6,
             },
           },
-          labelLayerId,
+          labelLayerId
         );
       });
 

@@ -1,6 +1,8 @@
 // app/_layout.tsx
 
 import { Slot, Stack, useRouter, Redirect } from "expo-router";
+import "@/global.css";
+import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 
@@ -17,8 +19,8 @@ export default function RootLayout() {
   }, [isLoggedIn]);
 
   return (
-    <View className="flex-1">
-      <Slot />
-    </View>
+    <GluestackUIProvider mode="light"><View className="flex-1">
+        <Slot />
+      </View></GluestackUIProvider>
   );
 }

@@ -1,16 +1,14 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  Alert,
-  TouchableOpacity,
-  Platform,
-} from "react-native";
+import { View, Alert, Platform } from "react-native";
 import { Link, useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons"; // For the eye icon
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { Button, ButtonText } from "@/components/ui/button";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { Heading } from "@/components/ui/heading";
+import { Text } from "@/components/ui/text";
+
+import { EyeIcon, EyeOffIcon } from "lucide-react-native";
 
 import { API_HOST } from "../../constants/vars";
 
@@ -30,7 +28,7 @@ export default function SignInScreen() {
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const onSignIn = async () => {
+  const signIn = async () => {
     // Basic validation
     if (!email || !password) {
       showAlert("Error", "Please enter both email and password.");
@@ -69,66 +67,70 @@ export default function SignInScreen() {
         // Handle error response
         showAlert(
           "Incorrect email or password",
-          data.message || "Registration failed",
+          data.message || "Registration failed"
         );
       }
     } catch (error) {
       // Handle network or other errors
       showAlert(
         "Error with backend server",
-        "An error occurred while registering. Please try again.",
+        "An error occurred while registering. Please try again."
       );
     }
   };
 
   return (
     <View className="flex-1 bg-white justify-center px-6">
-      <Text className="text-3xl font-bold text-center mb-8">Sign In</Text>
+      <Heading className="text-2xl text-center mb-8">Sign In</Heading>
 
-      <View className="mb-4 text-white">
+      <View className="mb-4">
         <Text className="text-gray-700 mb-2">Email</Text>
-        <TextInput
-          placeholder="Enter your email"
-          value={email}
-          onChangeText={setEmail}
-          className="border border-gray-300 rounded px-3 py-2"
-          inputMode="email"
-          autoCapitalize="none"
-        />
+        <Input>
+          <InputField
+            placeholder="Enter your email"
+            value={email}
+            onChangeText={setEmail}
+            inputMode="email"
+            autoCapitalize="none"
+          />
+        </Input>
       </View>
 
       <View className="mb-6">
         <Text className="text-gray-700 mb-2">Password</Text>
-        <View className="flex-row items-center border border-gray-300 rounded px-3 py-2">
-          <TextInput
+        <Input>
+          <InputField
             placeholder="Enter your password"
+            type={passwordVisible ? "text" : "password"}
             value={password}
             onChangeText={setPassword}
-            secureTextEntry={!passwordVisible}
-            className="flex-1"
           />
-          <TouchableOpacity
+          <InputSlot
+            className="pr-3"
             onPress={() => setPasswordVisible(!passwordVisible)}
           >
-            <Ionicons
-              name={passwordVisible ? "eye-off" : "eye"}
-              size={24}
-              color="gray"
+            <InputIcon
+              as={passwordVisible ? EyeIcon : EyeOffIcon}
+              className="text-darkBlue-500"
             />
-          </TouchableOpacity>
-        </View>
+          </InputSlot>
+        </Input>
       </View>
 
-      <Pressable onPress={onSignIn} className="bg-blue-500 rounded py-3 mb-4">
-        <Text className="text-white text-center font-semibold">Sign In</Text>
-      </Pressable>
+      <Button className="mb-6 p-3 rounded" onPress={signIn}>
+        <ButtonText className="text-white text-center font-medium text-sm">
+          Sign In
+        </ButtonText>
+      </Button>
 
       <Link href="./forgot-password" className="mb-4">
-        <Text className="text-blue-500 text-center">Forgot your password?</Text>
+        <Text className="text-sm text-blue-500 text-center">
+          Forgot your password?
+        </Text>
       </Link>
 
       <Link href="./register">
-        <Text className="text-blue-500 text-center">
+        <Text className="text-sm text-blue-500 text-center">
           Don't have an account? Register
         </Text>
       </Link>
