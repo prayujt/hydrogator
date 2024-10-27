@@ -1,16 +1,15 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  Alert,
-  TouchableOpacity,
-  Platform,
-} from "react-native";
+
 import { Link, useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons"; // For the eye icon
 import { API_HOST } from "../../constants/vars";
+
+import { Button, ButtonText } from "@/components/ui/button";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { Heading } from "@/components/ui/heading";
+import { Text } from "@/components/ui/text";
+
+import { EyeIcon, EyeOffIcon } from "lucide-react-native";
+import { View, Alert, Platform } from "react-native";
 
 const showAlert = (title: string, message: string) => {
   if (Platform.OS === "web") {
@@ -70,7 +69,7 @@ export default function RegisterScreen() {
     setPassword(text);
   };
 
-  const onRegister = async () => {
+  const register = async () => {
     if (!emailRegex.test(email)) {
       showAlert("Error", "Please enter a valid email address.");
       return;
@@ -119,73 +118,78 @@ export default function RegisterScreen() {
       // Handle network or other errors
       showAlert(
         "Error",
-        "An error occurred while registering. Please try again.",
+        "An error occurred while registering. Please try again."
       );
     }
   };
 
   return (
     <View className="flex-1 bg-white justify-center px-6">
-      <Text className="text-3xl font-bold text-center mb-8">Register</Text>
+      <Heading className="text-2xl text-center mb-8">Register</Heading>
 
       <View className="mb-4">
         <Text className="text-gray-700 mb-2">Username</Text>
-        <TextInput
-          placeholder="Enter your username"
-          value={username}
-          onChangeText={validateUsername}
-          className="border border-gray-300 rounded px-3 py-2"
-          autoCapitalize="none"
-        />
+        <Input>
+          <InputField
+            placeholder="Enter your username"
+            value={username}
+            onChangeText={validateUsername}
+            autoCapitalize="none"
+          />
+        </Input>
         {usernameError ? (
-          <Text className="text-red-500">{usernameError}</Text>
-        ) : null}
+            <Text className="text-red-500">{usernameError}</Text>
+          ) : null}
       </View>
 
       <View className="mb-6">
         <Text className="text-gray-700 mb-2">Email</Text>
-        <TextInput
-          placeholder="Enter your email"
-          value={email}
-          onChangeText={validateEmail}
-          className="border border-gray-300 rounded px-3 py-2"
-          inputMode="email"
-          autoCapitalize="none"
-        />
+        <Input>
+          <InputField
+            placeholder="Enter your email"
+            value={email}
+            onChangeText={validateEmail}
+            className="border border-gray-300 rounded px-3 py-2"
+            inputMode="email"
+            autoCapitalize="none"
+          />
+        </Input>
         {emailError ? <Text className="text-red-500">{emailError}</Text> : null}
+
       </View>
 
       <View className="mb-6">
         <Text className="text-gray-700 mb-2">Password</Text>
-        <View className="flex-row items-center border border-gray-300 rounded px-3 py-2">
-          <TextInput
+        <Input>
+          <InputField
             placeholder="Enter your password"
             value={password}
             onChangeText={validatePassword}
             secureTextEntry={!passwordVisible} // Toggle secureTextEntry based on visibility
-            className="flex-1"
           />
-          <TouchableOpacity
+          <InputSlot
+            className="pr-3"
             onPress={() => setPasswordVisible(!passwordVisible)}
           >
-            <Ionicons
-              name={passwordVisible ? "eye-off" : "eye"}
-              size={24}
-              color="gray"
+            <InputIcon
+              as={passwordVisible ? EyeIcon : EyeOffIcon}
+              className="text-darkBlue-500"
             />
-          </TouchableOpacity>
-        </View>
+          </InputSlot>
+        </Input>
         {passwordError ? (
           <Text className="text-red-500">{passwordError}</Text>
         ) : null}
       </View>
 
-      <Pressable onPress={onRegister} className="bg-blue-500 rounded py-3 mb-4">
-        <Text className="text-white text-center font-semibold">Register</Text>
-      </Pressable>
+      <Button onPress={register} className="mb-6 p-3 rounded">
+        <ButtonText className="text-white text-center font-medium text-sm">
+          Register
+        </ButtonText>
+      </Button>
 
       <Link href="./sign-in">
-        <Text className="text-blue-500 text-center">
+        <Text className="text-sm text-blue-500 text-center">
           Already have an account? Sign In
         </Text>
       </Link>

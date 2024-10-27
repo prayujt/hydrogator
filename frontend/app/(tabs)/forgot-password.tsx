@@ -1,16 +1,14 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  Alert,
-  TouchableOpacity,
-  Platform,
-} from "react-native";
 import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons"; // For the eye icon
 import { API_HOST } from "../../constants/vars";
+
+import { Button, ButtonText } from "@/components/ui/button";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { Heading } from "@/components/ui/heading";
+import { Text } from "@/components/ui/text";
+
+import { EyeIcon, EyeOffIcon } from "lucide-react-native";
+import { View, Alert, Platform } from "react-native";
 
 const showAlert = (title: string, message: string) => {
   if (Platform.OS === "web") {
@@ -34,7 +32,7 @@ export default function ForgotPasswordScreen() {
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const onSubmitEmail = async () => {
+  const submitEmail = async () => {
     if (!email) {
       showAlert("Error", "Please enter your email address.");
       return;
@@ -76,7 +74,7 @@ export default function ForgotPasswordScreen() {
     }
   };
 
-  const onSubmitCode = async () => {
+  const submitCode = async () => {
     if (!resetCode) {
       showAlert("Error", "Please enter the 6-digit reset code.");
       return;
@@ -113,7 +111,7 @@ export default function ForgotPasswordScreen() {
     }
   };
 
-  const onSubmitNewPassword = async () => {
+  const submitNewPassword = async () => {
     if (!validResetCode) {
       showAlert("Error", "Incorrect reset code was submitted.");
       return;
@@ -164,7 +162,7 @@ export default function ForgotPasswordScreen() {
     router.replace("/sign-in");
   };
 
-  const onGoBack = () => {
+  const goBack = () => {
     if (step > 1) {
       setStep(step - 1);
     }
@@ -172,25 +170,27 @@ export default function ForgotPasswordScreen() {
 
   return (
     <View className="flex-1 bg-white justify-center px-6">
-      <Text className="text-3xl font-bold text-center mb-8">
+      <Heading className="text-2xl text-center mb-8">
         {step === 1
           ? "Forgot Password"
           : step === 2
           ? "Enter Reset Code"
           : "Reset Password"}
-      </Text>
+      </Heading>
 
       {step === 1 && (
         <View className="mb-6">
           <Text className="text-gray-700 mb-2">Enter your email address</Text>
-          <TextInput
-            placeholder="Enter your email"
-            value={email}
-            onChangeText={setEmail}
-            className="border border-gray-300 rounded px-3 py-2"
-            inputMode="email"
-            autoCapitalize="none"
-          />
+          <Input>
+            <InputField
+                placeholder="Enter your email"
+                value={email}
+                onChangeText={setEmail}
+                className="border border-gray-300 rounded px-3 py-2"
+                inputMode="email"
+                autoCapitalize="none"
+              />
+          </Input>
         </View>
       )}
 
@@ -199,45 +199,47 @@ export default function ForgotPasswordScreen() {
           <Text className="text-gray-700 mb-2">
             Enter the 6-digit code sent to your email
           </Text>
-          <TextInput
-            placeholder="Enter reset code"
-            value={resetCode}
-            onChangeText={setResetCode}
-            className="border border-gray-300 rounded px-3 py-2"
-            keyboardType="numeric"
-            maxLength={6}
-          />
+          <Input>
+            <InputField
+              placeholder="Enter reset code"
+              value={resetCode}
+              onChangeText={setResetCode}
+              className="border border-gray-300 rounded px-3 py-2"
+              keyboardType="numeric"
+              maxLength={6}
+            />
+          </Input>
         </View>
       )}
 
       {step === 3 && (
-        <>
+        <View>
           <View className="mb-6">
             <Text className="text-gray-700 mb-2">New Password</Text>
-            <View className="flex-row items-center border border-gray-300 rounded px-3 py-2">
-              <TextInput
+            <Input>
+              <InputField
                 placeholder="Enter new password"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!passwordVisible} // Toggle password visibility
                 className="flex-1"
               />
-              <TouchableOpacity
+              <InputSlot
+                className="pr-3"
                 onPress={() => setPasswordVisible(!passwordVisible)}
               >
-                <Ionicons
-                  name={passwordVisible ? "eye-off" : "eye"}
-                  size={24}
-                  color="gray"
+                <InputIcon
+                  as={passwordVisible ? EyeIcon : EyeOffIcon}
+                  className="text-darkBlue-500"
                 />
-              </TouchableOpacity>
-            </View>
+              </InputSlot>
+            </Input>
           </View>
 
           <View className="mb-6">
             <Text className="text-gray-700 mb-2">Confirm New Password</Text>
-            <View className="flex-row items-center border border-gray-300 rounded px-3 py-2">
-              <TextInput
+            <Input>
+              <InputField
                 placeholder="Confirm new password"
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
@@ -250,56 +252,56 @@ export default function ForgotPasswordScreen() {
                       : "#bc1b13", // Change text color if passwords don't match
                 }}
               />
-              <TouchableOpacity
-                onPress={() =>
-                  setConfirmPasswordVisible(!confirmPasswordVisible)
-                }
+              <InputSlot
+                className="pr-3"
+                onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
               >
-                <Ionicons
-                  name={confirmPasswordVisible ? "eye-off" : "eye"}
-                  size={24}
-                  color="gray"
+                <InputIcon
+                  as={passwordVisible ? EyeIcon : EyeOffIcon}
+                  className="text-darkBlue-500"
                 />
-              </TouchableOpacity>
-            </View>
+              </InputSlot>
+            </Input>
           </View>
-        </>
+        </View>
       )}
 
       {step === 1 && (
-        <Pressable
-          onPress={onSubmitEmail}
-          className="bg-blue-500 rounded py-3 mb-4"
+        <Button
+          onPress={submitEmail}
+          className="rounded py-3 mb-4"
         >
-          <Text className="text-white text-center font-semibold">Submit</Text>
-        </Pressable>
+          <ButtonText className="text-white text-center font-medium text-sm">
+            Submit
+            </ButtonText>
+        </Button>
       )}
 
       {step === 2 && (
-        <Pressable
-          onPress={onSubmitCode}
-          className="bg-blue-500 rounded py-3 mb-4"
+        <Button
+          onPress={submitCode}
+          className="rounded py-3 mb-4"
         >
-          <Text className="text-white text-center font-semibold">
+          <ButtonText className="text-white text-center font-medium text-sm">
             Submit Code
-          </Text>
-        </Pressable>
+          </ButtonText>
+        </Button>
       )}
 
       {step === 3 && (
-        <Pressable
-          onPress={onSubmitNewPassword}
-          className="bg-blue-500 rounded py-3 mb-4"
+        <Button
+          onPress={submitNewPassword}
+          className="rounded py-3 mb-4"
         >
-          <Text className="text-white text-center font-semibold">
+          <ButtonText className="text-white text-center font-medium text-sm">
             Reset Password
-          </Text>
-        </Pressable>
+          </ButtonText>
+        </Button>
       )}
 
-      <Pressable onPress={onGoBack} className="bg-gray-400 rounded py-3 mb-4">
-        <Text className="text-white text-center font-semibold">Go Back</Text>
-      </Pressable>
+      <Button onPress={goBack} className="bg-red-500 rounded py-3 mb-4">
+        <ButtonText className="text-white text-center font-medium text-sm">Go Back</ButtonText>
+      </Button>
     </View>
   );
 }
