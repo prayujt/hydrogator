@@ -35,12 +35,14 @@ export const createBuilding = async (
     return res.status(201).json(building.toJSON());
 };
 
-export const getFountain = async (
+export const getFountains = async (
     req: Request,
     res: Response,
 ): Promise<Response> => {
-    const fountain = await Fountain.findByPk(req.params.id);
-    return res.status(200).json(fountain.toJSON());
+    const fountains = await Fountain.findAll({
+        where: { buildingId: req.params.buildingId },
+    });
+    return res.status(200).json(fountains.map((fountain) => fountain.toJSON()));
 };
 
 export const updateFountain = async (

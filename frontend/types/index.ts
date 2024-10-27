@@ -1,6 +1,11 @@
 export interface Fountain = {
+  id: string;
+  longitude: number;
+  latitude: number;
   floor: number;
+  hasBottleFiller: boolean;
   description: string;
+  buildingId: string;
 };
 
 export interface Building = {

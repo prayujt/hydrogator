@@ -15,24 +15,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
 
-import waterFountainData from "../water-fountains.json";
+/* import waterFountainData from "../water-fountains.json"; */
 import "../MapScreen.css";
 
 import { API_HOST } from "../../constants/vars";
-/* import type { Fountain, Building } from "../../types"; */
+import type { Fountain, Building } from "../../types";
 
 mapboxgl.accessToken = process.env.EXPO_PUBLIC_RNMAPBOX_API_KEY as string;
-
-type Fountain = {
-  floor: number;
-  description: string;
-};
-
-type Location = {
-  coordinates: [number, number];
-  building: string;
-  fountains: Fountain[];
-};
 
 const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
@@ -44,22 +33,174 @@ export default function MapScreen() {
   const router = useRouter();
 
   // Bottom Sheet
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
+  const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(
     null
   );
+  const [buildings, setBuildings] = useState<Building[]>([]);
+  const [buildingFountains, setBuildingFountains] = useState<Fountain[]>([]);
+
   const snapPoints = useMemo(() => {
-    if (selectedLocation) {
-      const contentLines = selectedLocation.fountains.length;
+    if (selectedBuilding) {
+      const contentLines = selectedBuilding.fountainCount;
       const minSnapPoint = Math.min(17 + contentLines * 5, 50);
       return [`${minSnapPoint}%`, "75%"];
     }
     return ["25%", "75%"];
-  }, [selectedLocation]);
+  }, [selectedBuilding]);
+
+  const fetchFountains = async (buildingId: string) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        // failed to retrieve token for request
+        throw Error("no token found");
+      }
+
+      const response = await fetch(
+        `${API_HOST}/buildings/${buildingId}/fountains`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setBuildingFountains(await response.json());
+
+      if (!response.ok) {
+        return;
+      }
+    } catch (error) {
+      // Handle network or other errors
+      console.error(error);
+    }
+  };
+
+  const fetchBuildings = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        // failed to retrieve token for request
+        throw Error("no token found");
+      }
+
+      const response = await fetch(`${API_HOST}/buildings`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setBuildings(await response.json());
+
+      if (!response.ok) {
+        return;
+      }
+    } catch (error) {
+      // Handle network or other errors
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    console.log("buildings set", buildings); // Debugging log
+    if (buildings.length === 0) return;
+    console.log("map", mapRef.current);
+    if (!mapRef.current) return;
+    // Add location markers for the water fountains
+    buildings.forEach((building) => {
+      const marker = new mapboxgl.Marker({ color: "red" })
+        .setLngLat([building.latitude, building.longitude])
+        .addTo(mapRef.current);
+
+      marker.getElement().addEventListener("click", async () => {
+        console.log("Marker clicked:", building); // Debugging log
+        setSelectedBuilding(building); // Open bottom sheet with this location data
+        await fetchFountains(building.id);
+      });
+
+      // Add click event listener to the marker
+      marker.getElement().addEventListener("click", () => {
+        if (userLocationRef.current) {
+          const userLocation = userLocationRef.current;
+          const fountainLocation = [building.latitude, building.longitude];
+
+          // Build the directions API URL
+          const directionsUrl = `https://api.mapbox.com/directions/v5/mapbox/walking/${userLocation[0]},${userLocation[1]};${fountainLocation[0]},${fountainLocation[1]}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
+
+          // Fetch directions
+          fetch(directionsUrl)
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.routes && data.routes.length > 0) {
+                const route = data.routes[0].geometry;
+
+                // Remove existing route layer if it exists
+                if (mapRef.current.getSource("route")) {
+                  mapRef.current.removeLayer("route");
+                  mapRef.current.removeSource("route");
+                }
+
+                // Add the route to the map
+                mapRef.current.addSource("route", {
+                  type: "geojson",
+                  data: {
+                    type: "Feature",
+                    properties: {},
+                    geometry: route,
+                  },
+                });
+
+                mapRef.current.addLayer({
+                  id: "route",
+                  type: "line",
+                  source: "route",
+                  layout: {
+                    "line-join": "round",
+                    "line-cap": "round",
+                  },
+                  paint: {
+                    "line-color": "#888",
+                    "line-width": 8,
+                  },
+                });
+
+                // Adjust the map view to fit the route
+                const coordinates = route.coordinates;
+                const bounds = coordinates.reduce(function (
+                  bounds: mapboxgl.LngLatBounds,
+                  coord: [number, number]
+                ) {
+                  return bounds.extend(coord);
+                },
+                new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+
+                mapRef.current.fitBounds(bounds, {
+                  padding: 50,
+                });
+                mapRef.current.easeTo({
+                  pitch: 30,
+                  bearing: 0,
+                });
+              } else {
+                console.error("No route found");
+              }
+            })
+            .catch((err) => {
+              console.error("Error fetching directions", err);
+            });
+        } else {
+          console.error("User location not available");
+        }
+      });
+    });
+  }, [buildings]);
 
   useEffect(() => {
     if (mapContainerRef.current) {
-      const locations: Location[] = waterFountainData as Location[];
-
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: "mapbox://styles/mapbox/streets-v12",
@@ -98,93 +239,6 @@ export default function MapScreen() {
           pitch: 30,
           zoom: 16,
           bearing: 0,
-        });
-      });
-
-      // Add location markers for the water fountains
-      locations.forEach((location) => {
-        const marker = new mapboxgl.Marker({ color: "red" })
-          .setLngLat(location.coordinates)
-          .addTo(map);
-
-        marker.getElement().addEventListener("click", () => {
-          console.log("Marker clicked:", location); // Debugging log
-          setSelectedLocation(location); // Open bottom sheet with this location data
-        });
-
-        // Add click event listener to the marker
-        marker.getElement().addEventListener("click", () => {
-          if (userLocationRef.current) {
-            const userLocation = userLocationRef.current;
-            const fountainLocation = location.coordinates;
-
-            // Build the directions API URL
-            const directionsUrl = `https://api.mapbox.com/directions/v5/mapbox/walking/${userLocation[0]},${userLocation[1]};${fountainLocation[0]},${fountainLocation[1]}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
-
-            // Fetch directions
-            fetch(directionsUrl)
-              .then((response) => response.json())
-              .then((data) => {
-                if (data.routes && data.routes.length > 0) {
-                  const route = data.routes[0].geometry;
-
-                  // Remove existing route layer if it exists
-                  if (map.getSource("route")) {
-                    map.removeLayer("route");
-                    map.removeSource("route");
-                  }
-
-                  // Add the route to the map
-                  map.addSource("route", {
-                    type: "geojson",
-                    data: {
-                      type: "Feature",
-                      properties: {},
-                      geometry: route,
-                    },
-                  });
-
-                  map.addLayer({
-                    id: "route",
-                    type: "line",
-                    source: "route",
-                    layout: {
-                      "line-join": "round",
-                      "line-cap": "round",
-                    },
-                    paint: {
-                      "line-color": "#888",
-                      "line-width": 8,
-                    },
-                  });
-
-                  // Adjust the map view to fit the route
-                  const coordinates = route.coordinates;
-                  const bounds = coordinates.reduce(function (
-                    bounds: mapboxgl.LngLatBounds,
-                    coord: [number, number]
-                  ) {
-                    return bounds.extend(coord);
-                  },
-                  new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
-
-                  map.fitBounds(bounds, {
-                    padding: 50,
-                  });
-                  map.easeTo({
-                    pitch: 30,
-                    bearing: 0,
-                  });
-                } else {
-                  console.error("No route found");
-                }
-              })
-              .catch((err) => {
-                console.error("Error fetching directions", err);
-              });
-          } else {
-            console.error("User location not available");
-          }
         });
       });
 
@@ -247,42 +301,14 @@ export default function MapScreen() {
 
       // Clean up on unmount
       return () => {
-        map.remove();
+        mapRef.current.remove();
       };
     }
   }, []);
 
   useEffect(() => {
-    const fetchBuildings = async () => {
-      try {
-        const token = await AsyncStorage.getItem("token");
-        if (!token) {
-          // failed to retrieve token for request
-          throw Error("no token found");
-        }
-
-        const response = await fetch(`${API_HOST}/buildings`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          console.log(data);
-        } else {
-          // Handle error response
-        }
-      } catch (error) {
-        // Handle network or other errors
-      }
-    };
-
-    fetchBuildings();
-  }, []);
+    if (mapRef.current) fetchBuildings();
+  }, [mapRef.current]);
 
   return (
     <BottomSheetModalProvider>
@@ -291,23 +317,23 @@ export default function MapScreen() {
           ref={mapContainerRef}
           style={{ width: screenWidth, height: screenHeight, zIndex: 0 }}
         />
-        {selectedLocation && (
+        {selectedBuilding && (
           <BottomSheet
             index={0}
             snapPoints={snapPoints}
-            onClose={() => setSelectedLocation(null)}
+            onClose={() => setSelectedBuilding(null)}
             style={{ zIndex: 10 }}
           >
             <View style={styles.contentContainer}>
               <TouchableOpacity
                 style={styles.closeButton}
-                onPress={() => setSelectedLocation(null)}
+                onPress={() => setSelectedBuilding(null)}
               >
                 <Text style={styles.closeButtonText}>×</Text>
               </TouchableOpacity>
 
-              <Text style={styles.title}>{selectedLocation.building}</Text>
-              {selectedLocation.fountains.map((fountain, index) => (
+              <Text style={styles.title}>{selectedBuilding.name}</Text>
+              {buildingFountains.map((fountain, index) => (
                 <Text
                   key={index}
                   style={styles.fountainInfo}

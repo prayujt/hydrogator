@@ -6,7 +6,6 @@ import { User } from "./models/user.model";
 import {
     createFountain,
     deleteFountain,
-    getFountain,
     updateFountain,
     createFountainReview,
 } from "./controllers/fountain.controller";
@@ -21,6 +20,7 @@ import {
 import {
     getBuildings,
     createBuilding,
+    getFountains,
 } from "./controllers/building.controller";
 
 import { authMiddleware } from "./middleware";
@@ -65,15 +65,15 @@ app.post("/validateForgot", validateForgotCode);
 app.post("/resetPassword", resetPassword);
 app.put("/profile", authMiddleware, updateUser);
 
-app.get("/fountain/:fountainId", getFountain);
+app.get("/buildings", getBuildings);
+app.post("/buildings", createBuilding);
+
+app.get("/buildings/:buildingId/fountains", getFountains);
 app.post("/fountain", createFountain);
 app.put("/fountain/:fountainId", updateFountain);
 app.delete("/fountain/:fountainId", deleteFountain);
 
 app.post("/fountains/:fountainId/reviews", createFountainReview);
-
-app.get("/buildings", getBuildings);
-app.post("/buildings", createBuilding);
 
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);

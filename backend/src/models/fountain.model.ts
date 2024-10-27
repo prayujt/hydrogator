@@ -26,6 +26,14 @@ Fountain.init(
       allowNull: false,
       defaultValue: false,
     },
+    floor: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   },
   {
     sequelize,
