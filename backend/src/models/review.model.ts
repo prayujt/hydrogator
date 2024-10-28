@@ -22,11 +22,11 @@ Review.init(
             primaryKey: true,
         },
         userId: {
-            type: DataTypes.STRING,
+            type: DataTypes.UUID,
             allowNull: false,
         },
         fountainId: {
-            type: DataTypes.STRING,
+            type: DataTypes.UUID,
             allowNull: false,
         },
         comment: {

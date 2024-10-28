@@ -134,7 +134,7 @@ export default function MapScreen() {
        *   .setLngLat([building.latitude, building.longitude])
        *   .addTo(mapRef.current); */
       const markerElement = document.createElement("div");
-      markerElement.style.backgroundColor = "blue";
+      markerElement.style.backgroundColor = "red";
       markerElement.style.borderRadius = "50%";
       markerElement.style.color = "white";
       markerElement.style.width = "30px";
@@ -179,8 +179,6 @@ export default function MapScreen() {
 
   useEffect(() => {
     if (mapContainerRef.current) {
-      console.log("running map");
-      if (mapRef.current) return;
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: "mapbox://styles/mapbox/streets-v12",
@@ -212,7 +210,7 @@ export default function MapScreen() {
       map.addControl(geolocateControl);
 
       // Store user's location when geolocated
-      geolocateControl.on("geolocate", function (e: any) {
+      geolocateControl.on("geolocate", (e: any) => {
         userLocationRef.current = [e.coords.longitude, e.coords.latitude];
         // Set the pitch back to 60 degrees
         map.easeTo({
@@ -222,14 +220,14 @@ export default function MapScreen() {
         });
       });
 
-      geolocateControl.on("geolocate", () => {
-        // Set the pitch back to 60 degrees
-        map.easeTo({
-          pitch: 30,
-          zoom: 16,
-          bearing: 0,
-        });
-      });
+      /* geolocateControl.on("geolocate", () => {
+       *   // Set the pitch back to 60 degrees
+       *   map.easeTo({
+       *     pitch: 30,
+       *     zoom: 16,
+       *     bearing: 0,
+       *   });
+       * }); */
 
       map.on("load", () => {
         // Trigger geolocation to center the map on the user's location
@@ -281,10 +279,13 @@ export default function MapScreen() {
 
       // Clean up on unmount
       return () => {
-        mapRef.current.remove();
+        if (mapRef.current) {
+          mapRef.current.remove();
+          mapRef.current = null;
+        }
       };
     }
-  }, []);
+  }, [mapContainerRef.current]);
 
   useEffect(() => {
     console.log("running fetch again");

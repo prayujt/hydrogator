@@ -2,12 +2,14 @@ import { Building } from "./models/building.model";
 import { Fountain } from "./models/fountain.model";
 import { Review } from "./models/review.model";
 import { User } from "./models/user.model";
+import { Like } from "./models/like.model";
 
 import {
     createFountain,
-    deleteFountain,
-    updateFountain,
     createFountainReview,
+    deleteFountain,
+    likeFountain,
+    updateFountain,
 } from "./controllers/fountain.controller";
 import {
     register,
@@ -19,8 +21,8 @@ import {
 } from "./controllers/user.controller";
 import {
     getBuildings,
+    getBuildingFountains,
     createBuilding,
-    getFountains,
 } from "./controllers/building.controller";
 
 import { authMiddleware } from "./middleware";
@@ -34,6 +36,7 @@ const syncModels = async (): Promise<void> => {
     await Fountain.sync();
     await User.sync();
     await Review.sync();
+    await Like.sync();
 };
 
 dotenv.config();
@@ -67,13 +70,14 @@ app.put("/profile", authMiddleware, updateUser);
 
 app.get("/buildings", getBuildings);
 app.post("/buildings", createBuilding);
+app.get("/buildings/:buildingId/fountains", getBuildingFountains);
 
-app.get("/buildings/:buildingId/fountains", getFountains);
 app.post("/fountain", createFountain);
 app.put("/fountain/:fountainId", updateFountain);
 app.delete("/fountain/:fountainId", deleteFountain);
 
 app.post("/fountains/:fountainId/reviews", createFountainReview);
+app.post("/fountains/:fountainId/like", authMiddleware, likeFountain);
 
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);

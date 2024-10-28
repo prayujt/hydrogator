@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import { Fountain } from "../models/fountain.model";
 import { Review } from "../models/review.model";
+import { Like } from "../models/like.model";
 
 import { AuthRequest } from "../middleware";
 
@@ -50,7 +51,6 @@ export const deleteFountain = async (
     return res.sendStatus(204);
 };
 
-
 export const createFountainReview = async (
     req: AuthRequest,
     res: Response,
@@ -63,4 +63,20 @@ export const createFountainReview = async (
         userId: req.user.id,
     });
     return res.status(201).json(review.toJSON());
+};
+
+export const likeFountain = async (
+    req: AuthRequest,
+    res: Response,
+): Promise<Response> => {
+    const fountainId = req.params.fountainId;
+    const userId = req.user.id;
+
+    const like = await Like.findOne({
+        where: { fountainId, userId },
+    });
+
+    if (like) await like.destroy();
+    else await Like.create({ fountainId, userId });
+    return res.status(200).json({ liked: !!like });
 };
