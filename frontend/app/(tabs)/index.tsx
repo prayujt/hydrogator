@@ -12,7 +12,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
 
-/* import waterFountainData from "../water-fountains.json"; */
 import "../MapScreen.css";
 
 import { API_HOST } from "../../constants/vars";
@@ -39,10 +38,10 @@ export default function MapScreen() {
   const snapPoints = useMemo(() => {
     if (selectedBuilding) {
       const contentLines = selectedBuilding.fountainCount;
-      const minSnapPoint = Math.min(17 + contentLines * 5, 50);
+      const minSnapPoint = Math.min(35 + contentLines * 5, 50);
       return [`${minSnapPoint}%`, "75%"];
     }
-    return ["25%", "75%"];
+    return ["40%", "75%"];
   }, [selectedBuilding]);
 
   const fetchFountains = async (buildingId: string) => {
@@ -103,96 +102,66 @@ export default function MapScreen() {
   };
 
   useEffect(() => {
-    console.log("buildings set", buildings); // Debugging log
+    if (!selectedBuilding && mapRef.current) {
+      mapRef.current.easeTo({
+        pitch: 30,
+        zoom: 16,
+        bearing: 0,
+      });
+    }
+  }, [selectedBuilding]);
+
+  useEffect(() => {
     if (buildings.length === 0) return;
-    console.log("map", mapRef.current);
     if (!mapRef.current) return;
     // Add location markers for the water fountains
     buildings.forEach((building) => {
-      const marker = new mapboxgl.Marker({ color: "red" })
-        .setLngLat([building.latitude, building.longitude])
-        .addTo(mapRef.current);
+      /* const marker = new mapboxgl.Marker({ color: "red" })
+       *   .setLngLat([building.latitude, building.longitude])
+       *   .addTo(mapRef.current); */
+      const markerElement = document.createElement("div");
+      markerElement.style.backgroundColor = "blue";
+      markerElement.style.borderRadius = "50%";
+      markerElement.style.color = "white";
+      markerElement.style.width = "30px";
+      markerElement.style.height = "30px";
+      markerElement.style.display = "flex";
+      markerElement.style.alignItems = "center";
+      markerElement.style.justifyContent = "center";
+      markerElement.style.fontSize = "14px";
+      markerElement.style.fontWeight = "bold";
+      markerElement.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.3)";
+      markerElement.innerHTML = `<span>${building.fountainCount}</span>`;
 
-      marker.getElement().addEventListener("click", async () => {
-        console.log("Marker clicked:", building); // Debugging log
-        setSelectedBuilding(building); // Open bottom sheet with this location data
-        await fetchFountains(building.id);
-      });
+      // Set up the marker with the custom element
+      if (mapRef.current) {
+        const marker = new mapboxgl.Marker({
+          element: markerElement,
+          anchor: "center",
+        })
+          .setLngLat([building.latitude, building.longitude])
+          .addTo(mapRef.current);
 
-      // Add click event listener to the marker
-      marker.getElement().addEventListener("click", () => {
-        if (userLocationRef.current) {
-          const userLocation = userLocationRef.current;
-          const fountainLocation = [building.latitude, building.longitude];
+        // Add click event listener to the marker
+        marker.getElement().addEventListener("click", async () => {
+          console.log("Marker clicked:", building); // Debugging log
+          setSelectedBuilding(building); // Open bottom sheet with this location data
+          await fetchFountains(building.id);
 
-          // Build the directions API URL
-          const directionsUrl = `https://api.mapbox.com/directions/v5/mapbox/walking/${userLocation[0]},${userLocation[1]};${fountainLocation[0]},${fountainLocation[1]}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
+          const buildingLocation = [
+            building.latitude,
+            building.longitude - 0.00025,
+          ];
 
-          // Fetch directions
-          fetch(directionsUrl)
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.routes && data.routes.length > 0) {
-                const route = data.routes[0].geometry;
-
-                // Remove existing route layer if it exists
-                if (mapRef.current.getSource("route")) {
-                  mapRef.current.removeLayer("route");
-                  mapRef.current.removeSource("route");
-                }
-
-                // Add the route to the map
-                mapRef.current.addSource("route", {
-                  type: "geojson",
-                  data: {
-                    type: "Feature",
-                    properties: {},
-                    geometry: route,
-                  },
-                });
-
-                mapRef.current.addLayer({
-                  id: "route",
-                  type: "line",
-                  source: "route",
-                  layout: {
-                    "line-join": "round",
-                    "line-cap": "round",
-                  },
-                  paint: {
-                    "line-color": "#888",
-                    "line-width": 8,
-                  },
-                });
-
-                // Adjust the map view to fit the route
-                const coordinates = route.coordinates;
-                const bounds = coordinates.reduce(function (
-                  bounds: mapboxgl.LngLatBounds,
-                  coord: [number, number]
-                ) {
-                  return bounds.extend(coord);
-                },
-                new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
-
-                mapRef.current.fitBounds(bounds, {
-                  padding: 50,
-                });
-                mapRef.current.easeTo({
-                  pitch: 30,
-                  bearing: 0,
-                });
-              } else {
-                console.error("No route found");
-              }
-            })
-            .catch((err) => {
-              console.error("Error fetching directions", err);
-            });
-        } else {
-          console.error("User location not available");
-        }
-      });
+          mapRef.current.easeTo({
+            center: buildingLocation,
+            zoom: 18,
+            pitch: 75,
+            bearing: -8,
+            duration: 1000,
+          });
+        });
+      }
     });
   }, [buildings]);
 
@@ -201,10 +170,10 @@ export default function MapScreen() {
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: "mapbox://styles/mapbox/streets-v12",
-        center: [-82.346, 29.648],
-        zoom: 16,
-        pitch: 30,
-        antialias: true, // Enable anti-aliasing for smoother 3D rendering
+        center: [-82.3475, 29.6465],
+        zoom: 12,
+        pitch: 50,
+        antialias: true,
       });
 
       mapRef.current = map;
@@ -331,14 +300,12 @@ export default function MapScreen() {
                 </ButtonText>
               </Button>
 
-              <Text className="text-lg font-bold">
-                {selectedBuilding.name}
-              </Text>
+              <Text className="text-lg font-bold">{selectedBuilding.name}</Text>
 
               {buildingFountains.map((fountain, index) => (
-                <Button 
+                <Button
                   key={index}
-                  className="bg-white" 
+                  className="bg-white"
                   variant="link"
                   onPress={() => {
                     router.push(`/water-fountain/${fountain.floor}`);
