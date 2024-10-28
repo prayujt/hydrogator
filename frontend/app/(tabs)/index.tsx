@@ -1,13 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
-import { View, Dimensions } from "react-native";
+import { Pressable } from "@/components/ui/pressable";
+import { ScrollView, View, Dimensions } from "react-native";
 
 import { useRouter } from "expo-router";
 
 import BottomSheet, { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { X } from "lucide-react-native";
 
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
@@ -32,6 +35,9 @@ export default function MapScreen() {
   const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(
     null
   );
+  const [groupedFountains, setGroupedFountains] = useState<{
+    [floor: number]: Fountain[];
+  }>({});
   const [buildings, setBuildings] = useState<Building[]>([]);
   const [buildingFountains, setBuildingFountains] = useState<Fountain[]>([]);
 
@@ -41,7 +47,7 @@ export default function MapScreen() {
       const minSnapPoint = Math.min(35 + contentLines * 5, 50);
       return [`${minSnapPoint}%`, "75%"];
     }
-    return ["40%", "75%"];
+    return ["50%", "75%"];
   }, [selectedBuilding]);
 
   const fetchFountains = async (buildingId: string) => {
@@ -102,6 +108,14 @@ export default function MapScreen() {
   };
 
   useEffect(() => {
+    const groups = buildingFountains.reduce((acc, fountain) => {
+      (acc[fountain.floor] = acc[fountain.floor] || []).push(fountain);
+      return acc;
+    }, {});
+    setGroupedFountains(groups);
+  }, [buildingFountains]);
+
+  useEffect(() => {
     if (!selectedBuilding && mapRef.current) {
       mapRef.current.easeTo({
         pitch: 30,
@@ -134,39 +148,39 @@ export default function MapScreen() {
       markerElement.innerHTML = `<span>${building.fountainCount}</span>`;
 
       // Set up the marker with the custom element
-      if (mapRef.current) {
-        const marker = new mapboxgl.Marker({
-          element: markerElement,
-          anchor: "center",
-        })
-          .setLngLat([building.latitude, building.longitude])
-          .addTo(mapRef.current);
+      const marker = new mapboxgl.Marker({
+        element: markerElement,
+        anchor: "center",
+      })
+        .setLngLat([building.latitude, building.longitude])
+        .addTo(mapRef.current);
 
-        // Add click event listener to the marker
-        marker.getElement().addEventListener("click", async () => {
-          console.log("Marker clicked:", building); // Debugging log
-          setSelectedBuilding(building); // Open bottom sheet with this location data
-          await fetchFountains(building.id);
+      // Add click event listener to the marker
+      marker.getElement().addEventListener("click", async () => {
+        console.log("Marker clicked:", building); // Debugging log
+        setSelectedBuilding(building); // Open bottom sheet with this location data
+        await fetchFountains(building.id);
 
-          const buildingLocation = [
-            building.latitude,
-            building.longitude - 0.00025,
-          ];
+        const buildingLocation = [
+          building.latitude,
+          building.longitude - 0.00035,
+        ];
 
-          mapRef.current.easeTo({
-            center: buildingLocation,
-            zoom: 18,
-            pitch: 75,
-            bearing: -8,
-            duration: 1000,
-          });
+        mapRef.current.easeTo({
+          center: buildingLocation,
+          zoom: 18,
+          pitch: 75,
+          bearing: -10,
+          duration: 750,
         });
-      }
+      });
     });
   }, [buildings]);
 
   useEffect(() => {
     if (mapContainerRef.current) {
+      console.log("running map");
+      if (mapRef.current) return;
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: "mapbox://styles/mapbox/streets-v12",
@@ -273,6 +287,7 @@ export default function MapScreen() {
   }, []);
 
   useEffect(() => {
+    console.log("running fetch again");
     if (mapRef.current) fetchBuildings();
   }, [mapRef.current]);
 
@@ -291,31 +306,42 @@ export default function MapScreen() {
             style={{ zIndex: 10 }}
           >
             <View className="items-center p-4 flex-1">
+              {/* Close Button */}
               <Button
                 className="absolute top-4 right-4 p-1 bg-[#ff6347] w-[30px] h-[30px] rounded-full justify-center items-center"
                 onPress={() => setSelectedBuilding(null)}
               >
-                <ButtonText className="text-white font-bold text-lg">
-                  x
-                </ButtonText>
+                <X color="white" size={20} />
               </Button>
 
-              <Text className="text-lg font-bold">{selectedBuilding.name}</Text>
+              {/* Building Name */}
+              <Heading className="text-lg mb-4">
+                {selectedBuilding.name}
+              </Heading>
 
-              {buildingFountains.map((fountain, index) => (
-                <Button
-                  key={index}
-                  className="bg-white"
-                  variant="link"
-                  onPress={() => {
-                    router.push(`/water-fountain/${fountain.floor}`);
-                  }}
-                >
-                  <ButtonText className="text-sm mt-2 text-black">
-                    Floor {fountain.floor}: {fountain.description}
-                  </ButtonText>
-                </Button>
-              ))}
+              <ScrollView className="w-full">
+                {Object.entries(groupedFountains).map(([floor, fountains]) => (
+                  <View key={floor} className="w-full mb-4 px-2">
+                    <Heading className="text-md mb-2">Floor {floor}</Heading>
+                    {fountains.map((fountain, index) => (
+                      <Pressable
+                        key={index}
+                        onPress={() =>
+                          router.push(`/water-fountain/${fountain.floor}`)
+                        }
+                        className="w-full flex flex-row items-center mb-2 bg-white p-2 rounded-lg shadow-sm"
+                      >
+                        <Text className="text-sm text-black">
+                          {fountain.description}
+                        </Text>
+                        <Text className="ml-auto text-[#ff6347] text-sm font-semibold">
+                          View
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                ))}
+              </ScrollView>
             </View>
           </BottomSheet>
         )}
