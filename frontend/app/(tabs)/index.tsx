@@ -134,7 +134,7 @@ export default function MapScreen() {
        *   .setLngLat([building.latitude, building.longitude])
        *   .addTo(mapRef.current); */
       const markerElement = document.createElement("div");
-      markerElement.style.backgroundColor = "red";
+      markerElement.style.backgroundColor = "blue";
       markerElement.style.borderRadius = "50%";
       markerElement.style.color = "white";
       markerElement.style.width = "30px";
@@ -211,27 +211,28 @@ export default function MapScreen() {
 
       // Store user's location when geolocated
       geolocateControl.on("geolocate", (e: any) => {
+        console.log("running geolocate");
         userLocationRef.current = [e.coords.longitude, e.coords.latitude];
         // Set the pitch back to 60 degrees
-        map.easeTo({
-          pitch: 30,
-          zoom: 16,
-          bearing: 0,
-        });
+        /* map.easeTo({
+         *   pitch: 30,
+         *   zoom: 16,
+         *   bearing: 0,
+         * }); */
       });
 
-      /* geolocateControl.on("geolocate", () => {
-       *   // Set the pitch back to 60 degrees
-       *   map.easeTo({
-       *     pitch: 30,
-       *     zoom: 16,
-       *     bearing: 0,
-       *   });
+      /* geolocateControl.on("geolocate", () => { */
+      // Set the pitch back to 60 degrees
+      /* map.easeTo({
+       *   pitch: 30,
+       *   zoom: 16,
+       *   bearing: 0,
        * }); */
+      /* }); */
 
       map.on("load", () => {
         // Trigger geolocation to center the map on the user's location
-        geolocateControl.trigger();
+        /* geolocateControl.trigger(); */
 
         // Insert the layer beneath any existing labels.
         const layers = map.getStyle().layers;
@@ -327,9 +328,7 @@ export default function MapScreen() {
                     {fountains.map((fountain, index) => (
                       <Pressable
                         key={index}
-                        onPress={() =>
-                          router.push(`/water-fountain/${fountain.floor}`)
-                        }
+                        onPress={() => router.push(`/fountains/${fountain.id}`)}
                         className="w-full flex flex-row items-center mb-2 bg-white p-2 rounded-lg shadow-sm"
                       >
                         <Text className="text-sm text-black">

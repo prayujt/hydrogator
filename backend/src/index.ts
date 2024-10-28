@@ -8,6 +8,7 @@ import {
     createFountain,
     createFountainReview,
     deleteFountain,
+    getFountain,
     likeFountain,
     updateFountain,
 } from "./controllers/fountain.controller";
@@ -72,9 +73,10 @@ app.get("/buildings", getBuildings);
 app.post("/buildings", createBuilding);
 app.get("/buildings/:buildingId/fountains", getBuildingFountains);
 
-app.post("/fountain", createFountain);
-app.put("/fountain/:fountainId", updateFountain);
-app.delete("/fountain/:fountainId", deleteFountain);
+app.post("/fountains", createFountain);
+app.get("/fountains/:fountainId", getFountain);
+app.put("/fountains/:fountainId", updateFountain);
+app.delete("/fountains/:fountainId", deleteFountain);
 
 app.post("/fountains/:fountainId/reviews", createFountainReview);
 app.post("/fountains/:fountainId/like", authMiddleware, likeFountain);
