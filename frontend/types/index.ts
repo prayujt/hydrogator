@@ -1,4 +1,4 @@
-export interface Fountain = {
+export interface Fountain {
   id: string;
   longitude: number;
   latitude: number;
@@ -8,7 +8,7 @@ export interface Fountain = {
   buildingId: string;
 };
 
-export interface Building = {
+export interface Building {
   id: number;
   longitude: number;
   latitude: number;
