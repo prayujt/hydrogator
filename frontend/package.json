@@ -13,7 +13,16 @@
     "postinstall": "patch-package"
   },
   "jest": {
-    "preset": "jest-expo"
+    "preset": "jest-expo",
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "**/*.{ts,tsx,js,jsx}",
+      "!**/coverage/**",
+      "!**/node_modules/**",
+      "!**/babel.config.js",
+      "!**/expo-env.d.ts",
+      "!**/.expo/**"
+    ]
   },
   "dependencies": {
     "@expo/html-elements": "^0.4.2",
@@ -60,6 +69,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@testing-library/react-native": "^12.8.0",
     "@types/jest": "^29.5.12",
     "@types/mapbox__mapbox-sdk": "^0.15.1",
     "@types/mapbox-gl": "^3.4.0",
