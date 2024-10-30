@@ -21,4 +21,4 @@ expo-env.d.ts
 
 .env
 
-coverage/**/
+coverage/**/*
