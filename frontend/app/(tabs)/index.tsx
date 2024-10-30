@@ -182,8 +182,8 @@ export default function MapScreen() {
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: "mapbox://styles/mapbox/streets-v12",
-        center: [-82.3475, 29.6465],
-        zoom: 12,
+        center: [-82.35, 29.645],
+        zoom: 16,
         pitch: 50,
         antialias: true,
       });
