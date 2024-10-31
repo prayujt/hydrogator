@@ -1,6 +1,6 @@
 // app/_layout.tsx
 
-import { Slot, Stack, useRouter, Redirect } from "expo-router";
+import { Slot, useRouter } from "expo-router";
 import "@/global.css";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import React, { useEffect, useState } from "react";

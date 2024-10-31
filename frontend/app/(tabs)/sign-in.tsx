@@ -57,8 +57,6 @@ export default function SignInScreen() {
 
       if (response.ok) {
         // On successful registration, navigate to the main tabs
-        console.log("Successfully signed in");
-        console.log(data);
         // Store the JWT token securely
         await AsyncStorage.setItem("token", data.token);
 
@@ -117,7 +115,7 @@ export default function SignInScreen() {
         </Input>
       </View>
 
-      <Button className="mb-6 p-3 rounded" onPress={signIn}>
+      <Button className="mb-6 p-3 rounded" onPress={signIn} testID="signInButton">
         <ButtonText className="text-white text-center font-medium text-sm">
           Sign In
         </ButtonText>
