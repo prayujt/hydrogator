@@ -50,10 +50,10 @@ describe('SignInScreen', () => {
       } as Response)
     );
   
-    const { getByPlaceholderText, getByTestId } = render(<SignInScreen />);
+    const { getByTestId } = render(<SignInScreen />);
   
-    const emailInput = getByPlaceholderText('Enter your email');
-    const passwordInput = getByPlaceholderText('Enter your password');
+    const emailInput = getByTestId('emailInput');
+    const passwordInput = getByTestId('passwordInput');
     const signInButton = getByTestId('signInButton');
   
     fireEvent.changeText(emailInput, 'test@example.com');
@@ -74,10 +74,10 @@ describe('SignInScreen', () => {
   it('should display an error message for invalid email', async () => {
     global.fetch = jest.fn();
     
-    const { getByPlaceholderText, getByTestId } = render(<SignInScreen />);
+    const { getByTestId } = render(<SignInScreen />);
 
-    const emailInput = getByPlaceholderText('Enter your email');
-    const passwordInput = getByPlaceholderText('Enter your password');
+    const emailInput = getByTestId('emailInput');
+    const passwordInput = getByTestId('passwordInput');
     const signInButton = getByTestId('signInButton');
 
     fireEvent.changeText(emailInput, 'invalid-email');

@@ -85,6 +85,7 @@ export default function SignInScreen() {
         <Text className="text-gray-700 mb-2">Email</Text>
         <Input>
           <InputField
+            testID="emailInput"
             placeholder="Enter your email"
             value={email}
             onChangeText={setEmail}
@@ -98,6 +99,7 @@ export default function SignInScreen() {
         <Text className="text-gray-700 mb-2">Password</Text>
         <Input>
           <InputField
+            testID="passwordInput"
             placeholder="Enter your password"
             type={passwordVisible ? "text" : "password"}
             value={password}
@@ -115,7 +117,11 @@ export default function SignInScreen() {
         </Input>
       </View>
 
-      <Button className="mb-6 p-3 rounded" onPress={signIn} testID="signInButton">
+      <Button
+        className="mb-6 p-3 rounded"
+        onPress={signIn}
+        testID="signInButton"
+      >
         <ButtonText className="text-white text-center font-medium text-sm">
           Sign In
         </ButtonText>

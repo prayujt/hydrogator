@@ -60,7 +60,7 @@ export default function ForgotPasswordScreen() {
       if (response.ok) {
         showAlert(
           "Success",
-          data.message || "A password reset code has been sent to your email",
+          data.message || "A password reset code has been sent to your email"
         );
         setStep(2);
       } else {
@@ -69,7 +69,7 @@ export default function ForgotPasswordScreen() {
     } catch (error) {
       showAlert(
         "Error with backend server",
-        "An error occurred. Please try again.",
+        "An error occurred. Please try again."
       );
     }
   };
@@ -106,7 +106,7 @@ export default function ForgotPasswordScreen() {
       setValidResetCode(false);
       showAlert(
         "Error with backend server",
-        "An error occurred. Please try again.",
+        "An error occurred. Please try again."
       );
     }
   };
@@ -153,7 +153,7 @@ export default function ForgotPasswordScreen() {
       setValidResetCode(false);
       showAlert(
         "Error with backend server",
-        "An error occurred. Please try again.",
+        "An error occurred. Please try again."
       );
     }
 
@@ -183,13 +183,14 @@ export default function ForgotPasswordScreen() {
           <Text className="text-gray-700 mb-2">Enter your email address</Text>
           <Input>
             <InputField
-                placeholder="Enter your email"
-                value={email}
-                onChangeText={setEmail}
-                className="border border-gray-300 rounded px-3 py-2"
-                inputMode="email"
-                autoCapitalize="none"
-              />
+              testID="emailInput"
+              placeholder="Enter your email"
+              value={email}
+              onChangeText={setEmail}
+              className="border border-gray-300 rounded px-3 py-2"
+              inputMode="email"
+              autoCapitalize="none"
+            />
           </Input>
         </View>
       )}
@@ -201,6 +202,7 @@ export default function ForgotPasswordScreen() {
           </Text>
           <Input>
             <InputField
+              testID="resetCodeInput"
               placeholder="Enter reset code"
               value={resetCode}
               onChangeText={setResetCode}
@@ -218,6 +220,7 @@ export default function ForgotPasswordScreen() {
             <Text className="text-gray-700 mb-2">New Password</Text>
             <Input>
               <InputField
+                testID="newPasswordInput"
                 placeholder="Enter new password"
                 value={password}
                 onChangeText={setPassword}
@@ -240,6 +243,7 @@ export default function ForgotPasswordScreen() {
             <Text className="text-gray-700 mb-2">Confirm New Password</Text>
             <Input>
               <InputField
+                testID="confirmPasswordInput"
                 placeholder="Confirm new password"
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
@@ -254,7 +258,9 @@ export default function ForgotPasswordScreen() {
               />
               <InputSlot
                 className="pr-3"
-                onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+                onPress={() =>
+                  setConfirmPasswordVisible(!confirmPasswordVisible)
+                }
               >
                 <InputIcon
                   as={passwordVisible ? EyeIcon : EyeOffIcon}
@@ -268,17 +274,19 @@ export default function ForgotPasswordScreen() {
 
       {step === 1 && (
         <Button
+          testID="submitButton1"
           onPress={submitEmail}
           className="rounded py-3 mb-4"
         >
           <ButtonText className="text-white text-center font-medium text-sm">
             Submit
-            </ButtonText>
+          </ButtonText>
         </Button>
       )}
 
       {step === 2 && (
         <Button
+          testID="submitButton2"
           onPress={submitCode}
           className="rounded py-3 mb-4"
         >
@@ -290,9 +298,9 @@ export default function ForgotPasswordScreen() {
 
       {step === 3 && (
         <Button
+          testID="submitButton3"
           onPress={submitNewPassword}
           className="rounded py-3 mb-4"
-          testID="resetPasswordButton"
         >
           <ButtonText className="text-white text-center font-medium text-sm">
             Reset Password
@@ -301,7 +309,9 @@ export default function ForgotPasswordScreen() {
       )}
 
       <Button onPress={goBack} className="bg-red-500 rounded py-3 mb-4">
-        <ButtonText className="text-white text-center font-medium text-sm">Go Back</ButtonText>
+        <ButtonText className="text-white text-center font-medium text-sm">
+          Go Back
+        </ButtonText>
       </Button>
     </View>
   );
