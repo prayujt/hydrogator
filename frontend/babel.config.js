@@ -2,22 +2,22 @@ module.exports = function (api) {
   api.cache(true);
   return {
     presets: [
-      'module:metro-react-native-babel-preset',
       [
         'babel-preset-expo', 
         {
           jsxImportSource: 'nativewind',
         }
       ],
+      // 'module:metro-react-native-babel-preset', // Breaks static rendering
       "nativewind/babel",
-      [
-        '@babel/preset-env', 
-        {
-          modules: false,
-          loose: true, // Set loose mode for preset-env as well
-        }
-      ],
-      '@babel/preset-react',
+      // [
+      //   '@babel/preset-env', 
+      //   {
+      //     modules: false,
+      //     loose: true, // Set loose mode for preset-env as well
+      //   }
+      // ], // Makes the page blank?
+      // '@babel/preset-react', // Breaks React
       '@babel/preset-typescript',
     ],
     plugins: [
