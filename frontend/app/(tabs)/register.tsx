@@ -40,7 +40,7 @@ export default function RegisterScreen() {
     // Alphanumeric, underscores, and dashes, between 3-20 characters
     if (!usernameRegex.test(text)) {
       setUsernameError(
-        "Username must be between 3 and 20 alphanumeric characters.",
+        "Username must be between 3 and 20 alphanumeric characters."
       );
     } else {
       setUsernameError("");
@@ -61,7 +61,7 @@ export default function RegisterScreen() {
     // At least 8 characters, one uppercase letter, one lowercase letter, and one number
     if (!passwordRegex.test(text)) {
       setPasswordError(
-        "Password must be between 8 and 20 characters and contain one uppercase letter, one lowercase letter, and one number.",
+        "Password must be between 8 and 20 characters and contain one uppercase letter, one lowercase letter, and one number."
       );
     } else {
       setPasswordError("");
@@ -78,7 +78,7 @@ export default function RegisterScreen() {
     if (!passwordRegex.test(password)) {
       showAlert(
         "Error",
-        "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number.",
+        "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number."
       );
       return;
     }
@@ -86,7 +86,7 @@ export default function RegisterScreen() {
     if (!usernameRegex.test(username)) {
       showAlert(
         "Error",
-        "Username must be at least 8 characters and contain one uppercase letter, one lowercase letter, and one number.",
+        "Username must be at least 8 characters and contain one uppercase letter, one lowercase letter, and one number."
       );
       return;
     }
@@ -131,6 +131,7 @@ export default function RegisterScreen() {
         <Text className="text-gray-700 mb-2">Username</Text>
         <Input>
           <InputField
+            testID="usernameInput"
             placeholder="Enter your username"
             value={username}
             onChangeText={validateUsername}
@@ -138,14 +139,15 @@ export default function RegisterScreen() {
           />
         </Input>
         {usernameError ? (
-            <Text className="text-red-500">{usernameError}</Text>
-          ) : null}
+          <Text className="text-red-500">{usernameError}</Text>
+        ) : null}
       </View>
 
       <View className="mb-6">
         <Text className="text-gray-700 mb-2">Email</Text>
         <Input>
           <InputField
+            testID="emailInput"
             placeholder="Enter your email"
             value={email}
             onChangeText={validateEmail}
@@ -155,13 +157,13 @@ export default function RegisterScreen() {
           />
         </Input>
         {emailError ? <Text className="text-red-500">{emailError}</Text> : null}
-
       </View>
 
       <View className="mb-6">
         <Text className="text-gray-700 mb-2">Password</Text>
         <Input>
           <InputField
+            testID="passwordInput"
             placeholder="Enter your password"
             value={password}
             onChangeText={validatePassword}
@@ -182,7 +184,11 @@ export default function RegisterScreen() {
         ) : null}
       </View>
 
-      <Button onPress={register} className="mb-6 p-3 rounded" testID="registerButton">
+      <Button
+        onPress={register}
+        className="mb-6 p-3 rounded"
+        testID="registerButton"
+      >
         <ButtonText className="text-white text-center font-medium text-sm">
           Register
         </ButtonText>
