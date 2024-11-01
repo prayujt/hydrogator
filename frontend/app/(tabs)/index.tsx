@@ -15,8 +15,6 @@ import { X } from "lucide-react-native";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
 
-import "../MapScreen.css";
-
 import { API_HOST } from "../../constants/vars";
 import type { Fountain, Building } from "../../types";
 

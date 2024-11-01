@@ -95,12 +95,6 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
         name="fountains/[id]"
         options={{
           href: null,

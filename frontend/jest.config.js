@@ -10,12 +10,12 @@ module.exports = {
       '^.+\\.[jt]sx?$': 'babel-jest',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|expo|expo-modules-core|expo-router|lucide-react-native|@expo|nativewind|@gluestack-ui/nativewind-utils|react-native-css-interop)/)',
+    'node_modules/(?!(react-native|@react-native|expo|expo-modules-core|expo-router|lucide-react-native|@expo|nativewind|@gluestack-ui/nativewind-utils|react-native-css-interop|@expo/vector-icons|expo-font|expo-asset|expo-constants|mapbox-gl)/)',
   ],
   globals: {
     __DEV__: true
   },
-  collectCoverage: true,
+  // collectCoverage: true,
   collectCoverageFrom: [
     "<rootDir>/app/**/*.{ts,tsx,js,jsx}", // Only include files in the /app/ directory
     "!**/coverage/**",

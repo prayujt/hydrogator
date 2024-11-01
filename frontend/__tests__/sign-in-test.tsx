@@ -1,4 +1,3 @@
-/* global __DEV__ */
 import React, { ReactNode } from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import SignInScreen from '../app/(tabs)/sign-in';
@@ -75,7 +74,7 @@ describe('SignInScreen', () => {
   it('should display an error message for invalid email', async () => {
     global.fetch = jest.fn();
     
-    const { getByPlaceholderText, getByText, getByTestId } = render(<SignInScreen />);
+    const { getByPlaceholderText, getByTestId } = render(<SignInScreen />);
 
     const emailInput = getByPlaceholderText('Enter your email');
     const passwordInput = getByPlaceholderText('Enter your password');

@@ -182,7 +182,7 @@ export default function RegisterScreen() {
         ) : null}
       </View>
 
-      <Button onPress={register} className="mb-6 p-3 rounded">
+      <Button onPress={register} className="mb-6 p-3 rounded" testID="registerButton">
         <ButtonText className="text-white text-center font-medium text-sm">
           Register
         </ButtonText>

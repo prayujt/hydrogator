@@ -292,6 +292,7 @@ export default function ForgotPasswordScreen() {
         <Button
           onPress={submitNewPassword}
           className="rounded py-3 mb-4"
+          testID="resetPasswordButton"
         >
           <ButtonText className="text-white text-center font-medium text-sm">
             Reset Password
