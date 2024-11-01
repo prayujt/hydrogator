@@ -288,12 +288,13 @@ export default function MapScreen() {
 
   useEffect(() => {
     console.log("running fetch again");
+    console.log(mapRef.current);
     if (mapRef.current) fetchBuildings();
   }, [mapRef.current]);
 
   return (
-    <BottomSheetModalProvider>
-      <View className="flex-1 bg-white">
+    <BottomSheetModalProvider >
+      <View className="flex-1 bg-white" testID = "mapContainer">
         <div
           ref={mapContainerRef}
           style={{ width: screenWidth, height: screenHeight, zIndex: 0 }}

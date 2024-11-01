@@ -12,6 +12,10 @@ module.exports = {
   transformIgnorePatterns: [
     'node_modules/(?!(react-native|@react-native|expo|expo-modules-core|expo-router|lucide-react-native|@expo|nativewind|@gluestack-ui/nativewind-utils|react-native-css-interop|@expo/vector-icons|expo-font|expo-asset|expo-constants|mapbox-gl)/)',
   ],
+  moduleNameMapper: {
+    'mapbox-gl': '<rootDir>/__mocks__/mapbox-gl.js',
+    '\\.css$': 'identity-obj-proxy', // if not already added
+  },
   globals: {
     __DEV__: true
   },
