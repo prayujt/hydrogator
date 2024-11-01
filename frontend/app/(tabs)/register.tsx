@@ -139,7 +139,9 @@ export default function RegisterScreen() {
           />
         </Input>
         {usernameError ? (
-          <Text className="text-red-500">{usernameError}</Text>
+          <Text testID="usernameErrorField" className="text-red-500">
+            {usernameError}
+          </Text>
         ) : null}
       </View>
 
@@ -156,7 +158,11 @@ export default function RegisterScreen() {
             autoCapitalize="none"
           />
         </Input>
-        {emailError ? <Text className="text-red-500">{emailError}</Text> : null}
+        {emailError ? (
+          <Text testID="emailErrorField" className="text-red-500">
+            {emailError}
+          </Text>
+        ) : null}
       </View>
 
       <View className="mb-6">
@@ -180,7 +186,9 @@ export default function RegisterScreen() {
           </InputSlot>
         </Input>
         {passwordError ? (
-          <Text className="text-red-500">{passwordError}</Text>
+          <Text testID="passwordErrorField" className="text-red-500">
+            {passwordError}
+          </Text>
         ) : null}
       </View>
 

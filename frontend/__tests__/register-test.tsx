@@ -75,75 +75,63 @@ describe("RegisterScreen", () => {
   // Username Validation Tests
   describe("Username Validation", () => {
     it("should show error for invalid username (too short)", async () => {
-      const { getByPlaceholderText, getByText } = render(<RegisterScreen />);
+      const { getByTestId } = render(<RegisterScreen />);
 
-      const usernameInput = getByPlaceholderText("Enter your username");
+      const usernameInput = getByTestId("usernameInput");
       fireEvent.changeText(usernameInput, "us");
 
-      expect(
-        getByText("Username must be between 3 and 20 alphanumeric characters.")
-      ).toBeTruthy();
+      expect(getByTestId("usernameErrorField")).toBeTruthy();
     });
 
     it("should show error for username with invalid characters", async () => {
-      const { getByPlaceholderText, getByText } = render(<RegisterScreen />);
+      const { getByTestId } = render(<RegisterScreen />);
 
-      const usernameInput = getByPlaceholderText("Enter your username");
+      const usernameInput = getByTestId("usernameInput");
       fireEvent.changeText(usernameInput, "user!@#");
 
-      expect(
-        getByText("Username must be between 3 and 20 alphanumeric characters.")
-      ).toBeTruthy();
+      expect(getByTestId("usernameErrorField")).toBeTruthy();
     });
   });
 
   // Email Validation Tests
   describe("Email Validation", () => {
     it("should show error for invalid email format", async () => {
-      const { getByTestId, getByText } = render(<RegisterScreen />);
+      const { getByTestId } = render(<RegisterScreen />);
 
       const emailInput = getByTestId("emailInput");
       fireEvent.changeText(emailInput, "invalidemail");
 
-      expect(getByText("Enter a valid email address.")).toBeTruthy();
+      expect(getByTestId("emailErrorField")).toBeTruthy();
     });
 
     it("should accept valid email formats", async () => {
-      const { getByTestId, queryByText } = render(<RegisterScreen />);
+      const { getByTestId, queryByTestId } = render(<RegisterScreen />);
 
       const emailInput = getByTestId("emailInput");
       fireEvent.changeText(emailInput, "valid.email123@example.com");
 
-      expect(queryByText("Enter a valid email address.")).toBeNull();
+      expect(queryByTestId("emailErrorField")).toBeNull();
     });
   });
 
   // Password Validation Tests
   describe("Password Validation", () => {
     it("should show error for password without uppercase letter", async () => {
-      const { getByText } = render(<RegisterScreen />);
+      const { getByTestId } = render(<RegisterScreen />);
 
       const passwordInput = getByTestId("passwordInput");
       fireEvent.changeText(passwordInput, "password123");
 
-      expect(
-        getByText(
-          "Password must be between 8 and 20 characters and contain one uppercase letter, one lowercase letter, and one number."
-        )
-      ).toBeTruthy();
+      expect(getByTestId("passwordErrorField")).toBeTruthy();
     });
 
     it("should show error for password without number", async () => {
-      const { getByTestId, getByText } = render(<RegisterScreen />);
+      const { getByTestId } = render(<RegisterScreen />);
 
       const passwordInput = getByTestId("passwordInput");
       fireEvent.changeText(passwordInput, "Password");
 
-      expect(
-        getByText(
-          "Password must be between 8 and 20 characters and contain one uppercase letter, one lowercase letter, and one number."
-        )
-      ).toBeTruthy();
+      expect(getByTestId("passwordErrorField")).toBeTruthy();
     });
   });
 

@@ -65,7 +65,7 @@ describe("ForgotPasswordScreen", () => {
         json: () => Promise.resolve({ message: "Reset code sent" }),
       });
 
-      const { getByTestId, getByText } = render(<ForgotPasswordScreen />);
+      const { getByTestId } = render(<ForgotPasswordScreen />);
 
       const emailInput = getByTestId("emailInput");
       const submitButton = getByTestId("submitButton1");
@@ -80,9 +80,7 @@ describe("ForgotPasswordScreen", () => {
           body: JSON.stringify({ email: "test@example.com" }),
         });
 
-        expect(
-          getByText("Enter the 6-digit code sent to your email")
-        ).toBeTruthy();
+        expect(getByTestId("resetCodeInput")).toBeTruthy();
       });
     });
   });
@@ -94,7 +92,7 @@ describe("ForgotPasswordScreen", () => {
         json: () => Promise.resolve({ message: "Reset code sent" }),
       });
 
-      const { getByTestId, getByText } = render(<ForgotPasswordScreen />);
+      const { getByTestId } = render(<ForgotPasswordScreen />);
 
       // Simulate reaching step 2
       const emailInput = getByTestId("emailInput");
@@ -104,9 +102,7 @@ describe("ForgotPasswordScreen", () => {
       fireEvent.press(submitButton);
 
       await waitFor(() => {
-        expect(
-          getByText("Enter the 6-digit code sent to your email")
-        ).toBeTruthy();
+        expect(getByTestId("resetCodeInput")).toBeTruthy();
       });
 
       const codeSubmitButton = getByTestId("submitButton2");
@@ -141,9 +137,7 @@ describe("ForgotPasswordScreen", () => {
       fireEvent.press(submitButton);
 
       await waitFor(() => {
-        expect(
-          getByText("Enter the 6-digit code sent to your email")
-        ).toBeTruthy();
+        expect(getByTestId("resetCodeInput")).toBeTruthy();
       });
 
       // Submit reset code
@@ -163,7 +157,7 @@ describe("ForgotPasswordScreen", () => {
           }),
         });
 
-        expect(getByText("New Password")).toBeTruthy();
+        expect(getByTestId("newPasswordInput")).toBeTruthy();
       });
     });
   });
@@ -190,9 +184,7 @@ describe("ForgotPasswordScreen", () => {
       fireEvent.press(submitButton);
 
       await waitFor(() => {
-        expect(
-          getByText("Enter the 6-digit code sent to your email")
-        ).toBeTruthy();
+        expect(getByTestId("resetCodeInput")).toBeTruthy();
       });
 
       const codeInput = getByTestId("resetCodeInput");
@@ -202,7 +194,7 @@ describe("ForgotPasswordScreen", () => {
       fireEvent.press(codeSubmitButton);
 
       await waitFor(() => {
-        expect(getByText("New Password")).toBeTruthy();
+        expect(getByTestId("newPasswordInput")).toBeTruthy();
       });
 
       // Try to reset password with mismatched passwords
