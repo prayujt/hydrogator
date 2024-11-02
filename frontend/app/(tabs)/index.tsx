@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -12,20 +12,18 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { X } from "lucide-react-native";
 
-import "mapbox-gl/dist/mapbox-gl.css";
-import mapboxgl from "mapbox-gl";
+import Mapbox from "@rnmapbox/maps";
 
 import { API_HOST } from "../../constants/vars";
 import type { Fountain, Building } from "../../types";
 
-mapboxgl.accessToken = process.env.EXPO_PUBLIC_RNMAPBOX_API_KEY as string;
+Mapbox.setAccessToken(process.env.EXPO_PUBLIC_RNMAPBOX_API_KEY as string);
 
 const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
 
-export default function MapScreen() {
-  const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
+const MapScreen = () => {
+  const mapRef = useRef<Mapbox.MapView | null>(null);
   const userLocationRef = useRef<[number, number] | null>(null);
   const router = useRouter();
 
@@ -38,6 +36,15 @@ export default function MapScreen() {
   }>({});
   const [buildings, setBuildings] = useState<Building[]>([]);
   const [buildingFountains, setBuildingFountains] = useState<Fountain[]>([]);
+
+  const layerStyles = {
+    building: {
+      fillExtrusionOpacity: 0.5,
+      fillExtrusionHeight: ["get", "height"],
+      fillExtrusionBase: ["get", "base_height"],
+      fillExtrusionColor: ["get", "color"],
+    },
+  };
 
   const snapPoints = useMemo(() => {
     if (selectedBuilding) {
@@ -106,201 +113,21 @@ export default function MapScreen() {
   };
 
   useEffect(() => {
-    const groups = buildingFountains.reduce((acc, fountain) => {
-      (acc[fountain.floor] = acc[fountain.floor] || []).push(fountain);
-      return acc;
-    }, {});
-    setGroupedFountains(groups);
-  }, [buildingFountains]);
-
-  useEffect(() => {
-    if (!selectedBuilding && mapRef.current) {
-      mapRef.current.easeTo({
-        pitch: 30,
-        zoom: 16,
-        bearing: 0,
-      });
-    }
-  }, [selectedBuilding]);
-
-  useEffect(() => {
-    if (buildings.length === 0) return;
-    if (!mapRef.current) return;
-    // Add location markers for the water fountains
-    buildings.forEach((building) => {
-      /* const marker = new mapboxgl.Marker({ color: "red" })
-       *   .setLngLat([building.latitude, building.longitude])
-       *   .addTo(mapRef.current); */
-      const markerElement = document.createElement("div");
-      markerElement.style.backgroundColor = "blue";
-      markerElement.style.borderRadius = "50%";
-      markerElement.style.color = "white";
-      markerElement.style.width = "30px";
-      markerElement.style.height = "30px";
-      markerElement.style.display = "flex";
-      markerElement.style.alignItems = "center";
-      markerElement.style.justifyContent = "center";
-      markerElement.style.fontSize = "14px";
-      markerElement.style.fontWeight = "bold";
-      markerElement.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.3)";
-      markerElement.innerHTML = `<span>${building.fountainCount}</span>`;
-
-      // Set up the marker with the custom element
-      const marker = new mapboxgl.Marker({
-        element: markerElement,
-        anchor: "center",
-      })
-        .setLngLat([building.latitude, building.longitude])
-        .addTo(mapRef.current);
-
-      // Add click event listener to the marker
-      marker.getElement().addEventListener("click", async () => {
-        console.log("Marker clicked:", building); // Debugging log
-        setSelectedBuilding(building); // Open bottom sheet with this location data
-        await fetchFountains(building.id);
-
-        const buildingLocation = [
-          building.latitude,
-          building.longitude - 0.00035,
-        ];
-
-        mapRef.current.easeTo({
-          center: buildingLocation,
-          zoom: 18,
-          pitch: 75,
-          bearing: -10,
-          duration: 750,
-        });
-      });
-    });
-  }, [buildings]);
-
-  useEffect(() => {
-    console.log("running initial");
-    if (mapContainerRef.current) {
-      console.log("container ref found");
-      const map = new mapboxgl.Map({
-        container: mapContainerRef.current,
-        style: "mapbox://styles/mapbox/streets-v12",
-        center: [-82.35, 29.645],
-        zoom: 16,
-        pitch: 50,
-        antialias: true,
-      });
-
-      mapRef.current = map;
-
-      // Add navigation control (zoom and rotation controls)
-      map.addControl(
-        new mapboxgl.NavigationControl({ visualizePitch: true }),
-        "top-right"
-      );
-
-      // Create a reference to the GeolocateControl
-      const geolocateControl = new mapboxgl.GeolocateControl({
-        positionOptions: {
-          enableHighAccuracy: true, // Request high accuracy
-        },
-        trackUserLocation: true,
-        showUserHeading: true,
-        showAccuracyCircle: false, // Disable the blue accuracy circle
-      });
-
-      // Add the GeolocateControl to the map
-      map.addControl(geolocateControl);
-
-      // Store user's location when geolocated
-      geolocateControl.on("geolocate", (e: any) => {
-        console.log("running geolocate");
-        userLocationRef.current = [e.coords.longitude, e.coords.latitude];
-        // Set the pitch back to 60 degrees
-        /* map.easeTo({
-         *   pitch: 30,
-         *   zoom: 16,
-         *   bearing: 0,
-         * }); */
-      });
-
-      /* geolocateControl.on("geolocate", () => { */
-      // Set the pitch back to 60 degrees
-      /* map.easeTo({
-       *   pitch: 30,
-       *   zoom: 16,
-       *   bearing: 0,
-       * }); */
-      /* }); */
-
-      map.on("load", () => {
-        // Trigger geolocation to center the map on the user's location
-        /* geolocateControl.trigger(); */
-
-        // Insert the layer beneath any existing labels.
-        const layers = map.getStyle().layers;
-        const labelLayerId = layers?.find(
-          (layer) => layer.type === "symbol" && layer.layout?.["text-field"]
-        )?.id;
-
-        // Add 3D buildings layer
-        map.addLayer(
-          {
-            id: "3d-buildings",
-            source: "composite",
-            "source-layer": "building",
-            filter: ["==", "extrude", "true"],
-            type: "fill-extrusion",
-            minzoom: 15,
-            paint: {
-              "fill-extrusion-color": "#aaa",
-
-              // Use an 'interpolate' expression to add height based on zoom level
-              "fill-extrusion-height": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                15,
-                0,
-                15.05,
-                ["get", "height"],
-              ],
-              "fill-extrusion-base": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                15,
-                0,
-                15.05,
-                ["get", "min_height"],
-              ],
-              "fill-extrusion-opacity": 0.6,
-            },
-          },
-          labelLayerId
-        );
-      });
-
-      // Clean up on unmount
-      return () => {
-        if (mapRef.current) {
-          mapRef.current.remove();
-          mapRef.current = null;
-        }
-      };
-    }
-  }, [mapContainerRef.current]);
-
-  useEffect(() => {
-    console.log("running fetch again");
     console.log(mapRef.current);
-    if (mapRef.current) fetchBuildings();
+    if (mapRef.current) {
+    }
   }, [mapRef.current]);
 
   return (
     <BottomSheetModalProvider>
       <View className="flex-1 bg-white" testID="mapContainer">
-        <div
-          ref={mapContainerRef}
+        <Mapbox.MapView
+          ref={mapRef}
           style={{ width: screenWidth, height: screenHeight, zIndex: 0 }}
-        />
+          styleURL="mapbox://styles/mapbox/streets-v12"
+        >
+          <Mapbox.Camera zoomLevel={15} centerCoordinate={[-82.35, 29.645]} />
+        </Mapbox.MapView>
         {selectedBuilding && (
           <BottomSheet
             index={0}
@@ -349,4 +176,6 @@ export default function MapScreen() {
       </View>
     </BottomSheetModalProvider>
   );
-}
+};
+
+export default MapScreen;
