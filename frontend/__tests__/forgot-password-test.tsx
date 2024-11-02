@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { render, fireEvent, waitFor, act } from "@testing-library/react-native";
+import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import ForgotPasswordScreen from "../app/(tabs)/forgot-password"; // Adjust import path as needed
 import { API_HOST } from "../constants/vars";
 
@@ -127,7 +127,7 @@ describe("ForgotPasswordScreen", () => {
           json: () => Promise.resolve({ token: "abc123" }),
         });
 
-      const { getByTestId, getByText } = render(<ForgotPasswordScreen />);
+      const { getByTestId } = render(<ForgotPasswordScreen />);
 
       // Simulate reaching step 2
       const emailInput = getByTestId("emailInput");
@@ -174,7 +174,7 @@ describe("ForgotPasswordScreen", () => {
           json: () => Promise.resolve({ token: "abc123" }),
         });
 
-      const { getByText, getByTestId } = render(<ForgotPasswordScreen />);
+      const { getByTestId } = render(<ForgotPasswordScreen />);
 
       // Simulate reaching step 3
       const emailInput = getByTestId("emailInput");

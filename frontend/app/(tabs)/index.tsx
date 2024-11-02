@@ -176,7 +176,9 @@ export default function MapScreen() {
   }, [buildings]);
 
   useEffect(() => {
+    console.log("running initial");
     if (mapContainerRef.current) {
+      console.log("container ref found");
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: "mapbox://styles/mapbox/streets-v12",
@@ -293,8 +295,8 @@ export default function MapScreen() {
   }, [mapRef.current]);
 
   return (
-    <BottomSheetModalProvider >
-      <View className="flex-1 bg-white" testID = "mapContainer">
+    <BottomSheetModalProvider>
+      <View className="flex-1 bg-white" testID="mapContainer">
         <div
           ref={mapContainerRef}
           style={{ width: screenWidth, height: screenHeight, zIndex: 0 }}
