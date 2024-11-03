@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { View, Alert, Platform } from "react-native";
 import { Link, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";

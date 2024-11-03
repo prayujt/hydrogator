@@ -45,6 +45,7 @@ export default function TabsLayout() {
         },
         tabBarActiveTintColor: "#007aff",
         tabBarInactiveTintColor: "gray",
+        tabBarPosition: "bottom",
         headerShown: false,
       })}
     >

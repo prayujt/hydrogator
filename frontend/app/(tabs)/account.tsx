@@ -1,6 +1,4 @@
-// AccountScreen.tsx
-
-import React from "react";
+// account.tsx
 import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";

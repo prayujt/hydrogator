@@ -1,9 +1,15 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { Pressable } from "@/components/ui/pressable";
-import { ScrollView, View, Dimensions } from "react-native";
+import {
+  Dimensions,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 
 import { useRouter } from "expo-router";
 
@@ -12,20 +18,36 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { X } from "lucide-react-native";
 
+// for native
+import Mapbox, {
+  MapView,
+  Camera,
+  Callout,
+  ShapeSource,
+  FillExtrusionLayer,
+  PointAnnotation,
+} from "@rnmapbox/maps";
+
+// for web
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
 
 import { API_HOST } from "../../constants/vars";
 import type { Fountain, Building } from "../../types";
 
-mapboxgl.accessToken = process.env.EXPO_PUBLIC_RNMAPBOX_API_KEY as string;
+if (Platform.OS === "web") {
+  mapboxgl.accessToken = process.env.EXPO_PUBLIC_RNMAPBOX_API_KEY as string;
+} else {
+  Mapbox.setAccessToken(process.env.EXPO_PUBLIC_RNMAPBOX_API_KEY as string);
+}
 
 const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
 
-export default function MapScreen() {
+const MapScreen = () => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const mapRef = useRef<Mapbox.MapView | any>(null);
+  const cameraRef = useRef<Mapbox.Camera>(null);
   const userLocationRef = useRef<[number, number] | null>(null);
   const router = useRouter();
 
@@ -115,11 +137,12 @@ export default function MapScreen() {
 
   useEffect(() => {
     if (!selectedBuilding && mapRef.current) {
-      mapRef.current.easeTo({
-        pitch: 30,
-        zoom: 16,
-        bearing: 0,
-      });
+      if (Platform.OS === "web")
+        mapRef.current.easeTo({
+          pitch: 30,
+          zoom: 16,
+          bearing: 0,
+        });
     }
   }, [selectedBuilding]);
 
@@ -128,56 +151,54 @@ export default function MapScreen() {
     if (!mapRef.current) return;
     // Add location markers for the water fountains
     buildings.forEach((building) => {
-      /* const marker = new mapboxgl.Marker({ color: "red" })
-       *   .setLngLat([building.latitude, building.longitude])
-       *   .addTo(mapRef.current); */
-      const markerElement = document.createElement("div");
-      markerElement.style.backgroundColor = "blue";
-      markerElement.style.borderRadius = "50%";
-      markerElement.style.color = "white";
-      markerElement.style.width = "30px";
-      markerElement.style.height = "30px";
-      markerElement.style.display = "flex";
-      markerElement.style.alignItems = "center";
-      markerElement.style.justifyContent = "center";
-      markerElement.style.fontSize = "14px";
-      markerElement.style.fontWeight = "bold";
-      markerElement.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.3)";
-      markerElement.innerHTML = `<span>${building.fountainCount}</span>`;
+      if (Platform.OS === "web") {
+        const markerElement = document.createElement("div");
+        markerElement.style.backgroundColor = "blue";
+        markerElement.style.borderRadius = "50%";
+        markerElement.style.color = "white";
+        markerElement.style.width = "30px";
+        markerElement.style.height = "30px";
+        markerElement.style.display = "flex";
+        markerElement.style.alignItems = "center";
+        markerElement.style.justifyContent = "center";
+        markerElement.style.fontSize = "14px";
+        markerElement.style.fontWeight = "bold";
+        markerElement.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.3)";
+        markerElement.innerHTML = `<span>${building.fountainCount}</span>`;
 
-      // Set up the marker with the custom element
-      const marker = new mapboxgl.Marker({
-        element: markerElement,
-        anchor: "center",
-      })
-        .setLngLat([building.latitude, building.longitude])
-        .addTo(mapRef.current);
+        // Set up the marker with the custom element
+        const marker = new mapboxgl.Marker({
+          element: markerElement,
+          anchor: "center",
+        })
+          .setLngLat([building.latitude, building.longitude])
+          .addTo(mapRef.current);
 
-      // Add click event listener to the marker
-      marker.getElement().addEventListener("click", async () => {
-        console.log("Marker clicked:", building); // Debugging log
-        setSelectedBuilding(building); // Open bottom sheet with this location data
-        await fetchFountains(building.id);
+        // Add click event listener to the marker
+        marker.getElement().addEventListener("click", async () => {
+          console.log("Marker clicked:", building); // Debugging log
+          setSelectedBuilding(building); // Open bottom sheet with this location data
+          await fetchFountains(building.id);
 
-        const buildingLocation = [
-          building.latitude,
-          building.longitude - 0.00035,
-        ];
+          const buildingLocation = [
+            building.latitude,
+            building.longitude - 0.00035,
+          ];
 
-        mapRef.current.easeTo({
-          center: buildingLocation,
-          zoom: 18,
-          pitch: 75,
-          bearing: -10,
-          duration: 750,
+          mapRef.current.easeTo({
+            center: buildingLocation,
+            zoom: 18,
+            pitch: 75,
+            bearing: -10,
+            duration: 750,
+          });
         });
-      });
+      }
     });
   }, [buildings]);
 
   useEffect(() => {
-    console.log("running initial");
-    if (mapContainerRef.current) {
+    if (mapContainerRef.current && Platform.OS === "web") {
       console.log("container ref found");
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
@@ -213,12 +234,6 @@ export default function MapScreen() {
       geolocateControl.on("geolocate", (e: any) => {
         console.log("running geolocate");
         userLocationRef.current = [e.coords.longitude, e.coords.latitude];
-        // Set the pitch back to 60 degrees
-        /* map.easeTo({
-         *   pitch: 30,
-         *   zoom: 16,
-         *   bearing: 0,
-         * }); */
       });
 
       /* geolocateControl.on("geolocate", () => { */
@@ -296,57 +311,131 @@ export default function MapScreen() {
 
   return (
     <BottomSheetModalProvider>
-      <View className="flex-1 bg-white" testID="mapContainer">
+      {Platform.OS === "web" ? (
         <div
           ref={mapContainerRef}
           style={{ width: screenWidth, height: screenHeight, zIndex: 0 }}
         />
-        {selectedBuilding && (
-          <BottomSheet
-            index={0}
-            snapPoints={snapPoints}
-            onClose={() => setSelectedBuilding(null)}
-            style={{ zIndex: 10 }}
-          >
-            <View className="items-center p-4 flex-1">
-              {/* Close Button */}
-              <Button
-                className="absolute top-4 right-4 p-1 bg-[#ff6347] w-[30px] h-[30px] rounded-full justify-center items-center"
-                onPress={() => setSelectedBuilding(null)}
+      ) : (
+        <MapView
+          ref={mapRef}
+          style={{ width: screenWidth, height: screenHeight, zIndex: 0 }}
+          styleURL="mapbox://styles/mapbox/streets-v12"
+          testID="mapView"
+        >
+          <Camera
+            ref={cameraRef}
+            zoomLevel={16}
+            centerCoordinate={[-82.35, 29.645]}
+            pitch={50}
+            animationMode="flyTo"
+            animationDuration={1000}
+          />
+          {buildings.map((building) => (
+            <Pressable
+              key={building.id}
+              onPress={async () => {
+                setSelectedBuilding(building);
+                await fetchFountains(building.id);
+
+                const buildingLocation = [
+                  building.latitude,
+                  building.longitude - 0.00035,
+                ];
+
+                if (cameraRef.current)
+                  cameraRef.current.setCamera({
+                    centerCoordinate: buildingLocation,
+                    zoomLevel: 14,
+                    pitch: 50,
+                    animationMode: "flyTo",
+                    animationDuration: 1000,
+                  });
+              }}
+            >
+              <PointAnnotation
+                key={building.id}
+                id={`marker-${building.id}`}
+                coordinate={[building.latitude, building.longitude]} // Note: longitude first, then latitude
               >
-                <X color="white" size={20} />
-              </Button>
+                <View style={styles.marker}>
+                  <Text style={styles.markerText}>
+                    {building.fountainCount}
+                  </Text>
+                </View>
+              </PointAnnotation>
+            </Pressable>
+          ))}
+        </MapView>
+      )}
+      {selectedBuilding && (
+        <BottomSheet
+          index={0}
+          snapPoints={snapPoints}
+          onClose={() => setSelectedBuilding(null)}
+          style={{ zIndex: 10 }}
+        >
+          <View className="items-center p-4 flex-1">
+            {/* Close Button */}
+            <Button
+              className="absolute top-4 right-4 p-1 bg-[#ff6347] w-[30px] h-[30px] rounded-full justify-center items-center"
+              onPress={() => setSelectedBuilding(null)}
+            >
+              <X color="white" size={20} />
+            </Button>
 
-              {/* Building Name */}
-              <Heading className="text-lg mb-4">
-                {selectedBuilding.name}
-              </Heading>
+            {/* Building Name */}
+            <Heading className="text-lg mb-4">{selectedBuilding.name}</Heading>
 
-              <ScrollView className="w-full">
-                {Object.entries(groupedFountains).map(([floor, fountains]) => (
-                  <View key={floor} className="w-full mb-4 px-2">
-                    <Heading className="text-md mb-2">Floor {floor}</Heading>
-                    {fountains.map((fountain, index) => (
-                      <Pressable
-                        key={index}
-                        onPress={() => router.push(`/fountains/${fountain.id}`)}
-                        className="w-full flex flex-row items-center mb-2 bg-white p-2 rounded-lg shadow-sm"
-                      >
-                        <Text className="text-sm text-black">
-                          {fountain.description}
-                        </Text>
-                        <Text className="ml-auto text-[#ff6347] text-sm font-semibold">
-                          View
-                        </Text>
-                      </Pressable>
-                    ))}
-                  </View>
-                ))}
-              </ScrollView>
-            </View>
-          </BottomSheet>
-        )}
-      </View>
+            <ScrollView className="w-full">
+              {Object.entries(groupedFountains).map(([floor, fountains]) => (
+                <View key={floor} className="w-full mb-4 px-2">
+                  <Heading className="text-md mb-2">Floor {floor}</Heading>
+                  {fountains.map((fountain, index) => (
+                    <Pressable
+                      key={index}
+                      onPress={() => router.push(`/fountains/${fountain.id}`)}
+                      className="w-full flex flex-row items-center mb-2 bg-white p-2 rounded-lg shadow-sm"
+                    >
+                      <Text className="text-sm text-black">
+                        {fountain.description}
+                      </Text>
+                      <Text className="ml-auto text-[#ff6347] text-sm font-semibold">
+                        View
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        </BottomSheet>
+      )}
     </BottomSheetModalProvider>
   );
-}
+};
+const styles = StyleSheet.create({
+  marker: {
+    backgroundColor: "blue",
+    borderRadius: 15, // Make it circular
+    width: 30,
+    height: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.3)", // Not supported in React Native
+  },
+  markerText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 14,
+  },
+  callout: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "gray",
+  },
+});
+
+export default MapScreen;

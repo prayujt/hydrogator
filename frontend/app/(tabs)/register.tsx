@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 import { Link, useRouter } from "expo-router";
 import { API_HOST } from "../../constants/vars";
