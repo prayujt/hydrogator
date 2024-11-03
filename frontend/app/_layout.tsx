@@ -1,10 +1,9 @@
 // app/_layout.tsx
 
-import { Slot, useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import "@/global.css";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
-import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import { useEffect, useState } from "react";
 
 export default function RootLayout() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -19,8 +18,10 @@ export default function RootLayout() {
   }, [isLoggedIn]);
 
   return (
-    <GluestackUIProvider mode="light"><View className="flex-1">
-        <Slot />
-      </View></GluestackUIProvider>
+    <GluestackUIProvider mode="light">
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack>
+    </GluestackUIProvider>
   );
 }

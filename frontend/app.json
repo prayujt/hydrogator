@@ -7,6 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
+    "entryPoint": "./App.js",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
@@ -37,8 +38,7 @@
       [
         "@rnmapbox/maps",
         {
-          "RNMapboxMapsImpl": "mapbox",
-          "RNMapboxMapsVersion": "11.0.0"
+          "RNMapboxMapsImpl": "mapbox"
         }
       ],
       [
@@ -50,6 +50,6 @@
     ],
     "experiments": {
       "typedRoutes": true
-    },
+    }
   }
 }
