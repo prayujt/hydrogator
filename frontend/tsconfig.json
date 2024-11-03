@@ -9,7 +9,8 @@
       "tailwind.config": [
         "./tailwind.config.js"
       ]
-    }
+    },
+    "jsx": "react-jsx"
   },
   "include": [
     "**/*.ts",
