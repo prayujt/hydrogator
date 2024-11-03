@@ -7,12 +7,17 @@ import { ScrollView, View, Dimensions } from "react-native";
 
 import { useRouter } from "expo-router";
 
-/* import BottomSheet, { BottomSheetModalProvider } from "@gorhom/bottom-sheet"; */
+import BottomSheet, { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { X } from "lucide-react-native";
 
-import Mapbox, { MapView, Camera } from "@rnmapbox/maps";
+import Mapbox, {
+  MapView,
+  Camera,
+  ShapeSource,
+  FillExtrusionLayer,
+} from "@rnmapbox/maps";
 
 import { API_HOST } from "../../constants/vars";
 import type { Fountain, Building } from "../../types";
@@ -119,27 +124,66 @@ const MapScreen = () => {
   }, [mapRef.current]);
 
   return (
-    <View style={styles.container}>
+    <BottomSheetModalProvider>
       <MapView
         ref={mapRef}
-        style={styles.map}
+        style={{ width: screenWidth, height: screenHeight, zIndex: 0 }}
         styleURL="mapbox://styles/mapbox/streets-v12"
-        // other props...
+        testID="mapView"
       >
-        <Camera zoomLevel={15} centerCoordinate={[-82.35, 29.645]} />
+        <Camera
+          zoomLevel={16}
+          centerCoordinate={[-82.35, 29.645]}
+          pitch={50}
+          animationMode="flyTo"
+          animationDuration={1000}
+        />
       </MapView>
-    </View>
-  );
-};
+      {selectedBuilding && (
+        <BottomSheet
+          index={0}
+          snapPoints={snapPoints}
+          onClose={() => setSelectedBuilding(null)}
+          style={{ zIndex: 10 }}
+        >
+          <View className="items-center p-4 flex-1">
+            {/* Close Button */}
+            <Button
+              className="absolute top-4 right-4 p-1 bg-[#ff6347] w-[30px] h-[30px] rounded-full justify-center items-center"
+              onPress={() => setSelectedBuilding(null)}
+            >
+              <X color="white" size={20} />
+            </Button>
 
-const styles = {
-  container: {
-    flex: 1, // or a fixed height like 400
-  },
-  map: {
-    height: "100%",
-    width: "100%",
-  },
+            {/* Building Name */}
+            <Heading className="text-lg mb-4">{selectedBuilding.name}</Heading>
+
+            <ScrollView className="w-full">
+              {Object.entries(groupedFountains).map(([floor, fountains]) => (
+                <View key={floor} className="w-full mb-4 px-2">
+                  <Heading className="text-md mb-2">Floor {floor}</Heading>
+                  {fountains.map((fountain, index) => (
+                    <Pressable
+                      key={index}
+                      onPress={() => router.push(`/fountains/${fountain.id}`)}
+                      className="w-full flex flex-row items-center mb-2 bg-white p-2 rounded-lg shadow-sm"
+                    >
+                      <Text className="text-sm text-black">
+                        {fountain.description}
+                      </Text>
+                      <Text className="ml-auto text-[#ff6347] text-sm font-semibold">
+                        View
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        </BottomSheet>
+      )}
+    </BottomSheetModalProvider>
+  );
 };
 
 export default MapScreen;
