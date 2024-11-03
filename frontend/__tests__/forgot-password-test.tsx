@@ -1,6 +1,6 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
-import ForgotPasswordScreen from "../app/(tabs)/forgot-password"; // Adjust import path as needed
+import ForgotPasswordScreen from "../app/(tabs)/forgot-password";
 import { API_HOST } from "../constants/vars";
 
 // Mock dependencies
