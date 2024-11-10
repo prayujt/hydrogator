@@ -13,6 +13,9 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_HOST } from "../../constants/vars";
+import { Button, ButtonText } from "@/components/ui/button";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { EyeIcon, EyeOffIcon } from "lucide-react-native";
 
 const showAlert = (title: string, message: string) => {
   if (Platform.OS === "web") {
@@ -30,13 +33,26 @@ interface BodyData {
 
 export default function EditProfileScreen() {
   const [userToken, setUserToken] = useState("");
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPasswordFields, setShowPasswordFields] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const [password, setPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false); // Toggle password visibility
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,20}$/;
+  const validatePassword = (text: string) => {
+    // At least 8 characters, one uppercase letter, one lowercase letter, and one number
+    if (!passwordRegex.test(text)) {
+      setPasswordError(
+        "Password must be between 8 and 20 characters and contain one uppercase letter, one lowercase letter, and one number."
+      );
+    } else {
+      setPasswordError("");
+    }
+    setPassword(text);
+  };
 
   // Function to fetch user profile
   const fetchUserProfile = async () => {
@@ -75,45 +91,13 @@ export default function EditProfileScreen() {
     fetchUserProfile();
   }, []);
 
-  const saveProfile = async () => {
+  const updatePassword = async () => {
     setLoading(true);
-    let validPassword = false;
-
     try {
-      // Validate password fields if the user is attempting to change the password
-      if (showPasswordFields && newPassword) {
-        if (newPassword !== confirmPassword) {
-          showAlert("Error", "New password and confirm password do not match");
-          setLoading(false);
-          return;
-        }
-        validPassword = true;
-      }
-
-      // Determine if username or email have changed
-      // const usernameHasChanged = username !== originalUsername;
-      // const emailHasChanged = email !== originalEmail;
-
       // Build the request body with only the fields that have changed or are valid
       const bodyData: BodyData = {};
-
-      // if (usernameHasChanged) {
-      if (username.length > 0 && username.length < 4) {
-        showAlert("Error", "Please enter a username larger than 3 characters");
-        return;
-      } else if (username.length > 3) {
-        bodyData.username = username;
-      }
-
-      if (email.length > 0 && !emailRegex.test(email)) {
-        showAlert("Error", "Please enter a valid email address.");
-        return;
-      } else if (email.length > 0) {
-        bodyData.email = email;
-      }
-
-      if (validPassword) {
-        bodyData.newPassword = newPassword;
+      if (passwordRegex.test(password)) {
+        bodyData.newPassword = password;
       }
 
       // Check if there are any fields to update
@@ -128,13 +112,25 @@ export default function EditProfileScreen() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`,
+          "Authorization": `Bearer ${userToken}`,
         },
         body: JSON.stringify(bodyData),
       });
 
+      
+    const { username, email, newPassword } = bodyData;
+    // Log each field's value
+    console.log("Username:", username);
+    if (username !== undefined && (typeof username !== "string" || username.trim() === "")) {
+      console.log("Bad");
+  } else{
+    console.log("Good")
+  }
+    console.log("Email:", email);
+    console.log("New Password:", newPassword);
+
       console.log(JSON.stringify(bodyData));
-      console.log(userToken);
+      // console.log(userToken);
 
       if (!profileResponse.ok) {
         const errorData = await profileResponse.json();
@@ -177,77 +173,42 @@ export default function EditProfileScreen() {
       )}
 
       <View className="mb-6">
-        <Text className="text-gray-800 mb-2 text-base font-medium">
-          Username
-        </Text>
-        <TextInput
-          value={username}
-          onChangeText={setUsername}
-          className="border border-gray-300 rounded-full px-4 py-3 text-base"
-          autoCapitalize="none"
-        />
-      </View>
-
-      <View className="mb-6">
-        <Text className="text-gray-800 mb-2 text-base font-medium">Email</Text>
-        <TextInput
-          value={email}
-          onChangeText={setEmail}
-          className="border border-gray-300 rounded-full px-4 py-3 text-base"
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-      </View>
-
-      {/* Change Password Button */}
-      <Pressable
-        onPress={() => setShowPasswordFields(!showPasswordFields)}
-        className="bg-gray-200 rounded-full py-3 mb-6"
-      >
-        <Text className="text-center text-base font-medium text-gray-800">
-          {showPasswordFields ? "Cancel Password Change" : "Change Password"}
-        </Text>
-      </Pressable>
-
-      {showPasswordFields && (
-        <View>
-          <View className="mb-6">
-            <Text className="text-gray-800 mb-2 text-base font-medium">
-              New Password
-            </Text>
-            <TextInput
-              placeholder="Enter your new password"
-              value={newPassword}
-              onChangeText={setNewPassword}
-              className="border border-gray-300 rounded-full px-4 py-3 text-base"
-              secureTextEntry
+        <Text className="text-gray-700 mb-2">New Password</Text>
+        <Input>
+          <InputField
+            testID="passwordInput"
+            placeholder="Enter your password"
+            value={password}
+            onChangeText={validatePassword}
+            secureTextEntry={!passwordVisible} // Toggle secureTextEntry based on visibility
+          />
+          <InputSlot
+            className="pr-3"
+            onPress={() => setPasswordVisible(!passwordVisible)}
+          >
+            <InputIcon
+              as={passwordVisible ? EyeIcon : EyeOffIcon}
+              className="text-darkBlue-500"
             />
-          </View>
-
-          <View className="mb-8">
-            <Text className="text-gray-800 mb-2 text-base font-medium">
-              Confirm New Password
-            </Text>
-            <TextInput
-              placeholder="Confirm your new password"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              className="border border-gray-300 rounded-full px-4 py-3 text-base"
-              secureTextEntry
-            />
-          </View>
-        </View>
-      )}
-
-      <Pressable
-        onPress={saveProfile}
-        className="bg-blue-600 rounded-full py-4 mb-6 shadow-lg"
-        disabled={loading}
+          </InputSlot>
+        </Input>
+        {passwordError ? (
+          <Text testID="passwordErrorField" className="text-red-500">
+            {passwordError}
+          </Text>
+        ) : null}
+      </View>
+      <Button
+        onPress={updatePassword}
+        className="mb-6 p-3 rounded"
+        testID="updatePasswordButton"
       >
-        <Text className="text-white text-center font-semibold text-lg">
-          {loading ? "Saving..." : "Save Changes"}
-        </Text>
-      </Pressable>
+        <ButtonText className="text-white text-center font-medium text-sm">
+          Update Password
+        </ButtonText>
+      </Button>
+      
     </ScrollView>
   );
 }
+

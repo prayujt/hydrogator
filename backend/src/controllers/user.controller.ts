@@ -135,30 +135,32 @@ export const resetPassword = async (
     return res.status(200).json({ message: "Password updated" });
 };
 
+
 export const updateUser = async (
     req: AuthRequest,
     res: Response,
-): Promise<Response> => {
+  ): Promise<Response> => {
     const user = await User.findByPk(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
-
+  
     const { username, email, newPassword } = req.body;
-
-    // Validate data
-    if (!username || typeof username !== "string") {
+  
+    // Validate data only if each field is provided in req.body
+    if ("username" in req.body && (typeof username !== "string" || username.trim() === "")) {
         return res.status(400).json({ message: "Invalid username" });
     }
-    if (!email || typeof email !== "string") {
+    if ("email" in req.body && (typeof email !== "string" || email.trim() === "")) {
         return res.status(400).json({ message: "Invalid email" });
     }
-    if (!newPassword || typeof newPassword !== "string") {
+    if ("newPassword" in req.body && (typeof newPassword !== "string" || newPassword.trim() === "")) {
         return res.status(400).json({ message: "Invalid password" });
     }
-
+  
     user.username = username;
     user.email = email;
     user.password = newPassword;
-
+  
     await user.save();
     return res.status(200).json(user.toJSON());
-};
+  };
+  
