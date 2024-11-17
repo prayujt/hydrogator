@@ -97,7 +97,13 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="fountains/[id]"
+        name="fountain/[id]/index"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="fountain/[id]/review"
         options={{
           href: null,
         }}

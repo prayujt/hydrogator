@@ -32,7 +32,7 @@ import Mapbox, {
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
 
-import { API_HOST } from "../../constants/vars";
+import { API_HOST } from "@/constants/vars";
 import type { Fountain, Building } from "../../types";
 
 if (Platform.OS === "web") {
@@ -394,7 +394,7 @@ const MapScreen = () => {
                   {fountains.map((fountain, index) => (
                     <Pressable
                       key={index}
-                      onPress={() => router.push(`/fountains/${fountain.id}`)}
+                      onPress={() => router.push(`/fountain/${fountain.id}`)}
                       className="w-full flex flex-row items-center mb-2 bg-white p-2 rounded-lg shadow-sm"
                     >
                       <Text className="text-sm text-black">
