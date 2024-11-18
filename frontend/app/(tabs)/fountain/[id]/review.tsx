@@ -14,30 +14,40 @@ import { Input, InputField } from "@/components/ui/input";
 export default function CreateReview() {
   const { fountainId } = useLocalSearchParams();
   const router = useRouter();
-  
+
   const [review, setReview] = useState({
     taste: 0,
     temperature: 0,
     flow: 0,
     filterStatus: 1,
-    comment: ""
+    comment: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleStarPress = (type: 'taste' | 'temperature' | 'flow', rating: number) => {
-    setReview(prev => ({ ...prev, [type]: rating }));
+  const handleStarPress = (
+    type: "taste" | "temperature" | "flow",
+    rating: number
+  ) => {
+    setReview((prev) => ({ ...prev, [type]: rating }));
   };
 
   const handleFilterStatusChange = (status: number) => {
-    setReview(prev => ({ ...prev, filterStatus: status }));
+    setReview((prev) => ({ ...prev, filterStatus: status }));
   };
 
-  const renderStarRating = (type: 'taste' | 'temperature' | 'flow', value: number) => {
+  const renderStarRating = (
+    type: "taste" | "temperature" | "flow",
+    value: number
+  ) => {
     return (
       <HStack className="space-x-2">
         {[1, 2, 3, 4, 5].map((star) => (
           <Pressable key={star} onPress={() => handleStarPress(type, star)}>
-            <Text className={`text-2xl ${star <= value ? "text-yellow-500" : "text-gray-300"}`}>
+            <Text
+              className={`text-2xl ${
+                star <= value ? "text-yellow-500" : "text-gray-300"
+              }`}
+            >
               ★
             </Text>
           </Pressable>
@@ -60,12 +70,12 @@ export default function CreateReview() {
         },
         body: JSON.stringify({
           ...review,
-          fountainId
+          fountainId,
         }),
       });
 
       if (!response.ok) throw Error("Failed to submit review");
-      
+
       router.push(`/fountain/${fountainId}`);
     } catch (error) {
       console.error(error);
@@ -95,19 +105,21 @@ export default function CreateReview() {
             {/* Taste Rating */}
             <VStack className="space-y-2">
               <Text className="text-gray-600 font-medium">Taste Rating</Text>
-              {renderStarRating('taste', review.taste)}
+              {renderStarRating("taste", review.taste)}
             </VStack>
 
             {/* Temperature Rating */}
             <VStack className="space-y-2">
-              <Text className="text-gray-600 font-medium">Temperature Rating</Text>
-              {renderStarRating('temperature', review.temperature)}
+              <Text className="text-gray-600 font-medium">
+                Temperature Rating
+              </Text>
+              {renderStarRating("temperature", review.temperature)}
             </VStack>
 
             {/* Flow Rating */}
             <VStack className="space-y-2">
               <Text className="text-gray-600 font-medium">Flow Rating</Text>
-              {renderStarRating('flow', review.flow)}
+              {renderStarRating("flow", review.flow)}
             </VStack>
 
             {/* Filter Status */}
@@ -117,14 +129,20 @@ export default function CreateReview() {
                 {[
                   { value: 2, label: "Good", color: "bg-green-500" },
                   { value: 1, label: "OK", color: "bg-yellow-500" },
-                  { value: 0, label: "Needs Replacement", color: "bg-red-500" }
+                  { value: 0, label: "Needs Replacement", color: "bg-red-500" },
                 ].map((status) => (
                   <Pressable
                     key={status.value}
                     onPress={() => handleFilterStatusChange(status.value)}
-                    className={`${status.color} ${review.filterStatus === status.value ? 'opacity-100' : 'opacity-50'} rounded-full py-2`}
+                    className={`${status.color} ${
+                      review.filterStatus === status.value
+                        ? "opacity-100"
+                        : "opacity-50"
+                    } rounded-full py-2`}
                   >
-                    <Text className="text-white text-center">{status.label}</Text>
+                    <Text className="text-white text-center">
+                      {status.label}
+                    </Text>
                   </Pressable>
                 ))}
               </VStack>
@@ -138,8 +156,10 @@ export default function CreateReview() {
                   placeholder="Share your thoughts about this water fountain..."
                   multiline
                   value={review.comment}
-                  onChangeText={(text) => setReview(prev => ({ ...prev, comment: text }))}
-                  className="border border-gray-300 rounded-lg p-3"
+                  onChangeText={(text) =>
+                    setReview((prev) => ({ ...prev, comment: text }))
+                  }
+                  className="border border-gray-300 rounded-lg p-3 pb-8"
                   numberOfLines={4}
                 />
               </Input>
@@ -149,7 +169,7 @@ export default function CreateReview() {
             <Button
               onPress={submitReview}
               disabled={isSubmitting}
-              className="bg-blue-500 py-3 rounded-lg"
+              className="py-3 rounded-lg"
             >
               <ButtonText className="text-white font-medium">
                 {isSubmitting ? "Submitting..." : "Submit Review"}

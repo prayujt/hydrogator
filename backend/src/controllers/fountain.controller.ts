@@ -23,7 +23,7 @@ export const getFountain = async (
 ): Promise<Response> => {
     const fountain = await Fountain.findByPk(req.params.fountainId, {
         attributes: {
-            include: [[sequelize.col("building.buildingName"), "buildingName"]],
+            include: [[sequelize.col("building.name"), "buildingName"]],
         },
         include: [
             {
