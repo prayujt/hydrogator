@@ -1,10 +1,13 @@
 import { Request, Response } from "express";
 
+import { Building } from "../models/building.model";
 import { Fountain } from "../models/fountain.model";
 import { Review } from "../models/review.model";
 import { Like } from "../models/like.model";
 
 import { AuthRequest } from "../middleware";
+
+import { sequelize } from "../database";
 
 export const createFountain = async (
     req: Request,
@@ -19,10 +22,18 @@ export const getFountain = async (
     res: Response,
 ): Promise<Response> => {
     const fountain = await Fountain.findByPk(req.params.fountainId, {
+        attributes: {
+            include: [[sequelize.col("building.buildingName"), "buildingName"]],
+        },
         include: [
             {
                 model: Review,
                 as: "reviews",
+            },
+            {
+                model: Building,
+                as: "building",
+                attributes: ["name"],
             },
         ],
     });
