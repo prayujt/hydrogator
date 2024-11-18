@@ -1,7 +1,15 @@
 import { useEffect, useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ArrowLeftIcon, Droplet, Thermometer, Star, Filter, Heart, GlassWater } from "lucide-react-native";
+import {
+  ArrowLeftIcon,
+  Droplet,
+  Thermometer,
+  Star,
+  Filter,
+  Heart,
+  GlassWater,
+} from "lucide-react-native";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -35,12 +43,14 @@ export default function WaterFountainDetail() {
   const router = useRouter();
 
   const [isFavorited, setIsFavorited] = useState(false);
-  const [fountain, setFountain] = useState<FountainWithReviews | undefined>(undefined);
+  const [fountain, setFountain] = useState<FountainWithReviews | undefined>(
+    undefined
+  );
   const [stats, setStats] = useState({
     avgTaste: 0,
     avgTemp: 0,
     avgFlow: 0,
-    avgFilterStatus: 0
+    avgFilterStatus: 0,
   });
 
   const fetchFountain = async (fountainId: string) => {
@@ -60,22 +70,40 @@ export default function WaterFountainDetail() {
 
       const data = await response.json();
       setFountain(data);
+      setIsFavorited(data.liked);
 
       // Calculate statistics
       if (data.reviews && data.reviews.length > 0) {
-        const avgTaste = data.reviews.reduce((sum: any, review: { taste: any; }) => sum + review.taste, 0) / data.reviews.length;
-        const avgTemp = data.reviews.reduce((sum: any, review: { temperature: any; }) => sum + review.temperature, 0) / data.reviews.length;
-        const avgFlow = data.reviews.reduce((sum: any, review: { flow: any; }) => sum + review.flow, 0) / data.reviews.length;
-        const avgFilterStatus = data.reviews.reduce((sum: any, review: { filterStatus: any; }) => sum + review.filterStatus, 0) / data.reviews.length;
+        const avgTaste =
+          data.reviews.reduce(
+            (sum: any, review: { taste: any }) => sum + review.taste,
+            0
+          ) / data.reviews.length;
+        const avgTemp =
+          data.reviews.reduce(
+            (sum: any, review: { temperature: any }) =>
+              sum + review.temperature,
+            0
+          ) / data.reviews.length;
+        const avgFlow =
+          data.reviews.reduce(
+            (sum: any, review: { flow: any }) => sum + review.flow,
+            0
+          ) / data.reviews.length;
+        const avgFilterStatus =
+          data.reviews.reduce(
+            (sum: any, review: { filterStatus: any }) =>
+              sum + review.filterStatus,
+            0
+          ) / data.reviews.length;
 
         setStats({
           avgTaste,
           avgTemp,
           avgFlow,
-          avgFilterStatus
+          avgFilterStatus,
         });
       }
-
     } catch (error) {
       console.error(error);
     }
@@ -123,40 +151,25 @@ export default function WaterFountainDetail() {
     }
   };
 
-  // Check if fountain is favorited on load
-  const checkFavoriteStatus = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (!token) {
-        throw Error("no token found");
-      }
-
-      const response = await fetch(`${API_HOST}/fountains/${fountainId}/favorite`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-      setIsFavorited(data.isFavorited);
-    } catch (error) {
-      console.error("Error checking favorite status:", error);
-    }
-  };
-
   useEffect(() => {
+    setFountain(undefined);
+    setStats({
+      avgTaste: 0,
+      avgTemp: 0,
+      avgFlow: 0,
+      avgFilterStatus: 0,
+    });
     fetchFountain(fountainId as string);
-    checkFavoriteStatus();
   }, [fountainId]);
-
 
   const getFilterStatusIcon = (status: number) => {
     const baseClasses = "w-full h-3 rounded-full overflow-hidden";
-    const gradientClasses = status === 3 ? "bg-gradient-to-r from-green-300 to-green-500" :
-                           status === 2 ? "bg-gradient-to-r from-yellow-300 to-yellow-500" :
-                                        "bg-gradient-to-r from-red-300 to-red-500";
+    const gradientClasses =
+      status === 3
+        ? "bg-gradient-to-r from-green-300 to-green-500"
+        : status === 2
+        ? "bg-gradient-to-r from-yellow-300 to-yellow-500"
+        : "bg-gradient-to-r from-red-300 to-red-500";
     return (
       <View className="w-full">
         <View className={`${baseClasses} bg-gray-200`}>
@@ -173,9 +186,11 @@ export default function WaterFountainDetail() {
     return (
       <HStack className="space-x-1">
         {[1, 2, 3, 4, 5].map((star) => (
-          <Text 
-            key={star} 
-            className={`text-lg ${star <= value ? "text-yellow-500" : "text-gray-300"}`}
+          <Text
+            key={star}
+            className={`text-lg ${
+              star <= value ? "text-yellow-500" : "text-gray-300"
+            }`}
           >
             ★
           </Text>
@@ -190,14 +205,14 @@ export default function WaterFountainDetail() {
         <VStack className="p-4 space-y-6">
           {/* Header with Favorite Button */}
           <HStack className="items-center justify-between">
-            <Button
-              variant="link"
-              onPress={() => router.push("/")}
-            >
-              <ButtonIcon as={ArrowLeftIcon} className="h-5 w-5 text-gray-900" />
+            <Button variant="link" onPress={() => router.push("/")}>
+              <ButtonIcon
+                as={ArrowLeftIcon}
+                className="h-5 w-5 text-gray-900"
+              />
               <ButtonText className="text-gray-900">Go Back</ButtonText>
             </Button>
-            
+
             <Pressable
               onPress={toggleFavorite}
               className="p-2 rounded-full bg-gray-50"
@@ -205,7 +220,9 @@ export default function WaterFountainDetail() {
               <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
                 <Heart
                   size={24}
-                  className={isFavorited ? "text-red-500 fill-red-500" : "text-gray-400"}
+                  className={
+                    isFavorited ? "text-red-500 fill-red-500" : "text-gray-400"
+                  }
                 />
               </Animated.View>
             </Pressable>
@@ -223,20 +240,26 @@ export default function WaterFountainDetail() {
                   <Text className="text-gray-600">{fountain.description}</Text>
                 </HStack>
 
-                 {/* Bottle Filler Indicator */}
-                 <View className="mt-2">
+                {/* Bottle Filler Indicator */}
+                <View className="mt-2">
                   <HStack className="justify-center items-center space-x-2 bg-blue-50 py-2 px-4 rounded-full self-center">
-                    <GlassWater 
-                      size={20} 
-                      className={fountain.hasBottleFiller ? "text-blue-500" : "text-gray-400"}
+                    <GlassWater
+                      size={20}
+                      className={
+                        fountain.hasBottleFiller
+                          ? "text-blue-500"
+                          : "text-gray-400"
+                      }
                     />
-                    <Text 
+                    <Text
                       className={`${
-                        fountain.hasBottleFiller ? "text-blue-700" : "text-gray-500"
+                        fountain.hasBottleFiller
+                          ? "text-blue-700"
+                          : "text-gray-500"
                       } font-medium`}
                     >
-                      {fountain.hasBottleFiller 
-                        ? "Bottle Filling Station Available" 
+                      {fountain.hasBottleFiller
+                        ? "Bottle Filling Station Available"
                         : "No Bottle Filling Station"}
                     </Text>
                   </HStack>
@@ -262,7 +285,9 @@ export default function WaterFountainDetail() {
                   <View className="w-[48%] mb-6">
                     <HStack className="items-center mb-2 space-x-2">
                       <Thermometer className="h-5 w-5 text-blue-500" />
-                      <Text className="text-gray-600 font-medium">Temperature</Text>
+                      <Text className="text-gray-600 font-medium">
+                        Temperature
+                      </Text>
                     </HStack>
                     <Text className="text-2xl font-bold mb-1">
                       {stats.avgTemp.toFixed(1)}
@@ -286,7 +311,9 @@ export default function WaterFountainDetail() {
                   <View className="w-[48%] mb-6">
                     <HStack className="items-center mb-2 space-x-2">
                       <Filter className="h-5 w-5 text-gray-500" />
-                      <Text className="text-gray-600 font-medium">Filter Status</Text>
+                      <Text className="text-gray-600 font-medium">
+                        Filter Status
+                      </Text>
                     </HStack>
                     <Text className="text-2xl font-bold mb-1">
                       {stats.avgFilterStatus.toFixed(1)}
@@ -299,9 +326,13 @@ export default function WaterFountainDetail() {
               {/* Reviews Section */}
               <View className="bg-white rounded-xl p-4 shadow-sm">
                 <HStack className="justify-between items-center mb-4">
-                  <Text className="text-xl font-bold text-gray-900">Reviews</Text>
+                  <Text className="text-xl font-bold text-gray-900">
+                    Reviews
+                  </Text>
                   <Button
-                    onPress={() => router.push(`/fountain/${fountainId}/review`)}
+                    onPress={() =>
+                      router.push(`/fountain/${fountainId}/review`)
+                    }
                     className="bg-blue-500 rounded-lg px-4 py-2"
                   >
                     <ButtonText className="text-white font-medium">
@@ -316,10 +347,12 @@ export default function WaterFountainDetail() {
                   </Text>
                 ) : (
                   fountain.reviews?.map((review, index) => (
-                    <View 
-                      key={review.id} 
+                    <View
+                      key={review.id}
                       className={`${
-                        index !== fountain.reviews.length - 1 ? "border-b border-gray-200" : ""
+                        index !== fountain.reviews.length - 1
+                          ? "border-b border-gray-200"
+                          : ""
                       } pb-4 mb-4`}
                     >
                       <HStack className="justify-between mb-2">
@@ -348,7 +381,9 @@ export default function WaterFountainDetail() {
                           </View>
                         </HStack>
                         {review.comment && (
-                          <Text className="text-gray-700 mt-2">{review.comment}</Text>
+                          <Text className="text-gray-700 mt-2">
+                            {review.comment}
+                          </Text>
                         )}
                       </VStack>
                     </View>
