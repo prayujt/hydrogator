@@ -71,10 +71,14 @@ app.put("/profile", authMiddleware, updateUser);
 
 app.get("/buildings", getBuildings);
 app.post("/buildings", createBuilding);
-app.get("/buildings/:buildingId/fountains", getBuildingFountains);
+app.get(
+    "/buildings/:buildingId/fountains",
+    authMiddleware,
+    getBuildingFountains,
+);
 
 app.post("/fountains", createFountain);
-app.get("/fountains/:fountainId", getFountain);
+app.get("/fountains/:fountainId", authMiddleware, getFountain);
 app.put("/fountains/:fountainId", updateFountain);
 app.delete("/fountains/:fountainId", deleteFountain);
 

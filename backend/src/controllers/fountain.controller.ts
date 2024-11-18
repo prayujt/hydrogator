@@ -18,7 +18,7 @@ export const createFountain = async (
 };
 
 export const getFountain = async (
-    req: Request,
+    req: AuthRequest,
     res: Response,
 ): Promise<Response> => {
     const fountain = await Fountain.findByPk(req.params.fountainId, {
@@ -37,7 +37,14 @@ export const getFountain = async (
             },
         ],
     });
-    return res.status(200).json(fountain.toJSON());
+
+    const liked = await Like.findOne({
+        where: { fountainId: req.params.fountainId, userId: req.user.id },
+    });
+    return res.status(200).json({
+        ...fountain?.toJSON(),
+        liked: !!liked,
+    });
 };
 
 export const updateFountain = async (
