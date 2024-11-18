@@ -4,6 +4,8 @@ import { Fountain } from "../models/fountain.model";
 import { Review } from "../models/review.model";
 import { Like } from "../models/like.model";
 
+import { AuthRequest } from "../middleware";
+
 export const getBuildings = async (
     _req: Request,
     res: Response,
@@ -41,9 +43,10 @@ export const createBuilding = async (
 };
 
 export const getBuildingFountains = async (
-    req: Request,
+    req: AuthRequest,
     res: Response,
 ): Promise<Response> => {
+    // attach whether the user has liked each fountain
     const fountains = await Fountain.findAll({
         where: { buildingId: req.params.buildingId },
         // include count of reviews and likes
@@ -65,6 +68,22 @@ export const getBuildingFountains = async (
                         ),
                     ),
                     "likeCount",
+                ],
+                [
+                    Fountain.sequelize.literal(`
+                    CASE
+                        WHEN EXISTS (
+                            SELECT 1
+                            FROM "likes"
+                            WHERE "likes"."fountainId" = "Fountain"."id"
+                            AND "likes"."userId" = ${Fountain.sequelize.escape(
+                                req.user.id,
+                            )}
+                        ) THEN true
+                        ELSE false
+                    END
+                `),
+                    "liked",
                 ],
             ],
         },
