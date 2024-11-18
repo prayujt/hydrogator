@@ -78,7 +78,11 @@ app.get("/fountains/:fountainId", getFountain);
 app.put("/fountains/:fountainId", updateFountain);
 app.delete("/fountains/:fountainId", deleteFountain);
 
-app.post("/fountains/:fountainId/reviews", createFountainReview);
+app.post(
+    "/fountains/:fountainId/reviews",
+    authMiddleware,
+    createFountainReview,
+);
 app.post("/fountains/:fountainId/like", authMiddleware, likeFountain);
 
 app.listen(port, () => {
