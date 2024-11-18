@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ArrowLeftIcon, Droplet, Thermometer, Star, Filter, Heart } from "lucide-react-native";
+import { ArrowLeftIcon, Droplet, Thermometer, Star, Filter, Heart, GlassWater } from "lucide-react-native";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -26,6 +26,7 @@ interface Review {
 }
 
 interface FountainWithReviews extends Fountain {
+  buildingName: string;
   reviews: Review[];
 }
 
@@ -105,8 +106,8 @@ export default function WaterFountainDetail() {
         throw Error("no token found");
       }
 
-      const response = await fetch(`${API_HOST}/fountains/${fountainId}/favorite`, {
-        method: isFavorited ? "DELETE" : "POST",
+      const response = await fetch(`${API_HOST}/fountains/${fountainId}/like`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -214,13 +215,32 @@ export default function WaterFountainDetail() {
             <>
               <VStack className="space-y-1 mb-2">
                 <Heading className="text-2xl text-center text-gray-900 font-bold">
-                  Building Name Here
+                  {fountain.buildingName}
                 </Heading>
                 <HStack className="justify-center space-x-2">
                   <Text className="text-gray-600">Floor {fountain.floor}</Text>
                   <Text className="text-gray-600">•</Text>
                   <Text className="text-gray-600">{fountain.description}</Text>
                 </HStack>
+
+                 {/* Bottle Filler Indicator */}
+                 <View className="mt-2">
+                  <HStack className="justify-center items-center space-x-2 bg-blue-50 py-2 px-4 rounded-full self-center">
+                    <GlassWater 
+                      size={20} 
+                      className={fountain.hasBottleFiller ? "text-blue-500" : "text-gray-400"}
+                    />
+                    <Text 
+                      className={`${
+                        fountain.hasBottleFiller ? "text-blue-700" : "text-gray-500"
+                      } font-medium`}
+                    >
+                      {fountain.hasBottleFiller 
+                        ? "Bottle Filling Station Available" 
+                        : "No Bottle Filling Station"}
+                    </Text>
+                  </HStack>
+                </View>
               </VStack>
 
               {/* Stats Grid */}
