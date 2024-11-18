@@ -12,7 +12,7 @@ import { API_HOST } from "@/constants/vars";
 import { Input, InputField } from "@/components/ui/input";
 
 export default function CreateReview() {
-  const { fountainId } = useLocalSearchParams();
+  const { id: fountainId } = useLocalSearchParams();
   const router = useRouter();
 
   const [review, setReview] = useState({
@@ -62,17 +62,20 @@ export default function CreateReview() {
       const token = await AsyncStorage.getItem("token");
       if (!token) throw Error("No token found");
 
-      const response = await fetch(`${API_HOST}/reviews`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          ...review,
-          fountainId,
-        }),
-      });
+      const response = await fetch(
+        `${API_HOST}/fountains/${fountainId}/reviews`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            ...review,
+            fountainId,
+          }),
+        }
+      );
 
       if (!response.ok) throw Error("Failed to submit review");
 
