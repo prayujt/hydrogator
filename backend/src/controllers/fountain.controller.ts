@@ -33,7 +33,7 @@ export const getFountain = async (
             {
                 model: Building,
                 as: "building",
-                attributes: ["name"],
+                attributes: [],
             },
         ],
     });
