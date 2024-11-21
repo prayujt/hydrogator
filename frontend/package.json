@@ -26,6 +26,7 @@
     "@gorhom/bottom-sheet": "^4.6.4",
     "@legendapp/motion": "^2.4.0",
     "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-native-community/slider": "^4.5.5",
     "@react-navigation/native": "^6.0.2",
     "@rnmapbox/maps": "^10.1.33",
     "babel-plugin-module-resolver": "^5.0.2",

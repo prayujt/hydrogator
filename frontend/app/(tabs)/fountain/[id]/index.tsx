@@ -268,6 +268,9 @@ export default function WaterFountainDetail() {
 
               {/* Stats Grid */}
               <View className="bg-white rounded-xl p-4 shadow-sm">
+                <Text className="text-xl font-bold text-gray-900 mb-4">
+                  Average Ratings
+                </Text>
                 <View className="flex-row flex-wrap justify-between">
                   {/* Taste */}
                   <View className="w-[48%] mb-6">
@@ -308,10 +311,10 @@ export default function WaterFountainDetail() {
                   </View>
 
                   {/* Filter Status */}
-                  <View className="w-[48%] mb-6">
+                  <View className="w-[48%] mb-6 ">
                     <HStack className="items-center mb-2 space-x-2">
                       <Filter className="h-5 w-5 text-gray-500" />
-                      <Text className="text-gray-600 font-medium">
+                      <Text className="text-gray-600 font-medium ">
                         Filter Status
                       </Text>
                     </HStack>
@@ -366,25 +369,30 @@ export default function WaterFountainDetail() {
                       <VStack className="space-y-2">
                         <HStack className="space-x-4">
                           <Text className="text-gray-600 flex-1">
-                            Taste: {renderStars(review.taste)}
+                            Taste {renderStars(review.taste)}
                           </Text>
                           <Text className="text-gray-600 flex-1">
-                            Temp: {renderStars(review.temperature)}
+                            Temperature {renderStars(review.temperature)}
                           </Text>
                         </HStack>
                         <HStack className="space-x-4">
                           <Text className="text-gray-600 flex-1">
-                            Flow: {renderStars(review.flow)}
+                            Flow {renderStars(review.flow)}
                           </Text>
-                          <View className="flex-1">
+                          <View className="w-[48%] mb-6 ">
+                            <View className="text-gray-600 flex-1 mb-2">
+                              Filter Status 
+                            </View>
                             {getFilterStatusIcon(review.filterStatus)}
                           </View>
                         </HStack>
-                        {review.comment && (
-                          <Text className="text-gray-700 mt-2">
-                            {review.comment}
-                          </Text>
-                        )}
+                        <View className='w-full'>
+                          {review.comment && (
+                            <Text className="text-gray-700 mt-2">
+                              {review.comment}
+                            </Text>
+                          )}
+                        </View>
                       </VStack>
                     </View>
                   ))
