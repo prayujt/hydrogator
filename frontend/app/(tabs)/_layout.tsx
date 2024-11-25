@@ -108,6 +108,12 @@ export default function TabsLayout() {
           href: null,
         }}
       />
+      <Tabs.Screen
+        name="create-fountain"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
