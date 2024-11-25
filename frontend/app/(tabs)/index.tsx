@@ -11,22 +11,15 @@ import {
   View,
 } from "react-native";
 
-import { useRouter } from "expo-router";
+import { Link, useRouter } from "expo-router";
 
 import BottomSheet, { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { X } from "lucide-react-native";
+import { PlusCircle, X } from "lucide-react-native";
 
 // for native
-import Mapbox, {
-  MapView,
-  Camera,
-  Callout,
-  ShapeSource,
-  FillExtrusionLayer,
-  PointAnnotation,
-} from "@rnmapbox/maps";
+import Mapbox, { MapView, Camera, PointAnnotation } from "@rnmapbox/maps";
 
 // for web
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -222,7 +215,7 @@ const MapScreen = () => {
         positionOptions: {
           enableHighAccuracy: true, // Request high accuracy
         },
-        trackUserLocation: true,
+        trackUserLocation: false,
         showUserHeading: true,
         showAccuracyCircle: false, // Disable the blue accuracy circle
       });
@@ -234,20 +227,22 @@ const MapScreen = () => {
       geolocateControl.on("geolocate", (e: any) => {
         console.log("running geolocate");
         userLocationRef.current = [e.coords.longitude, e.coords.latitude];
+        map.easeTo({
+          center: [-82.35, 29.645],
+          zoom: 16,
+          pitch: 50,
+        });
       });
 
-      /* geolocateControl.on("geolocate", () => { */
-      // Set the pitch back to 60 degrees
-      /* map.easeTo({
-       *   pitch: 30,
-       *   zoom: 16,
-       *   bearing: 0,
-       * }); */
-      /* }); */
+      map.easeTo({
+        center: [-82.35, 29.645],
+        zoom: 16,
+        pitch: 50,
+      });
 
       map.on("load", () => {
         // Trigger geolocation to center the map on the user's location
-        /* geolocateControl.trigger(); */
+        geolocateControl.trigger();
 
         // Insert the layer beneath any existing labels.
         const layers = map.getStyle().layers;
@@ -376,6 +371,14 @@ const MapScreen = () => {
           style={{ zIndex: 10 }}
         >
           <View className="items-center p-4 flex-1">
+            <Link href="/create-fountain" className="absolute top-1 left-5 p-1">
+              <View className="flex flex-row items-center justify-center gap-2">
+                <Button className="bg-blue-200 rounded-full justify-center items-center">
+                  <PlusCircle color="blue" size={20} />
+                </Button>
+                <Text>New Fountain</Text>
+              </View>
+            </Link>
             {/* Close Button */}
             <Button
               className="absolute top-4 right-4 p-1 bg-[#ff6347] w-[30px] h-[30px] rounded-full justify-center items-center"
