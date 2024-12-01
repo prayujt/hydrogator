@@ -38,7 +38,9 @@ export const getBuilding = async (
   req: Request,
   res: Response,
 ): Promise<Response> => {
-  const building = await Building.findByPk(req.params.id);
+  const building = await Building.findByPk(req.params.buildingId);
+  if (!building) return res.sendStatus(404);
+
   return res.status(200).json(building.toJSON());
 };
 
