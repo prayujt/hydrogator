@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
-import SignInScreen from "../app/(tabs)/sign-in";
-import { API_HOST } from "../constants/vars";
+import { API_HOST } from "@/constants/vars";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import EditProfileScreen from "@/app/(tabs)/edit-profile";
 
 jest.mock("react-native-svg", () => {
   return {
@@ -35,55 +35,50 @@ jest.mock("../constants/vars", () => ({
 }));
 
 beforeEach(() => {
-  // Reset fetch and AsyncStorage mocks before each test to ensure no leftover state
   jest.clearAllMocks();
 });
 
-describe("SignInScreen", () => {
+describe("EditProfileScreen", () => {
   it("should sign in successfully", async () => {
     global.fetch = jest.fn(() =>
       Promise.resolve({
         ok: true,
         status: 200,
-        json: () => Promise.resolve({ token: "abc123" }),
       } as Response)
     );
 
-    const { getByTestId } = render(<SignInScreen />);
+    const { getByTestId } = render(<EditProfileScreen />);
 
-    const emailInput = getByTestId("emailInput");
     const passwordInput = getByTestId("passwordInput");
-    const signInButton = getByTestId("signInButton");
+    const updatePasswordButton = getByTestId("updatePasswordButton");
 
-    fireEvent.changeText(emailInput, "test@example.com");
-    fireEvent.changeText(passwordInput, "password123");
-    fireEvent.press(signInButton);
+    fireEvent.changeText(passwordInput, "Password123");
+    fireEvent.press(updatePasswordButton);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(`${API_HOST}/signIn`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      expect(global.fetch).toHaveBeenCalledWith(`${API_HOST}/profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer ",
+        },
         body: JSON.stringify({
-          email: "test@example.com",
-          password: "password123",
+          newPassword: "Password123",
         }),
       });
-      expect(AsyncStorage.setItem).toHaveBeenCalledWith("token", "abc123");
     });
   });
 
   it("should display an error message for invalid email", async () => {
     global.fetch = jest.fn();
 
-    const { getByTestId } = render(<SignInScreen />);
+    const { getByTestId } = render(<EditProfileScreen />);
 
-    const emailInput = getByTestId("emailInput");
     const passwordInput = getByTestId("passwordInput");
-    const signInButton = getByTestId("signInButton");
+    const updatePasswordButton = getByTestId("updatePasswordButton");
 
-    fireEvent.changeText(emailInput, "invalid-email");
     fireEvent.changeText(passwordInput, "password123");
-    fireEvent.press(signInButton);
+    fireEvent.press(updatePasswordButton);
 
     await waitFor(() => {
       expect(global.fetch).not.toHaveBeenCalled();
