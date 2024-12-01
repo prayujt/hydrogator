@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { HStack } from "@/components/ui/hstack";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
 import { VStack } from "@/components/ui/vstack";
@@ -19,6 +21,8 @@ const CreateFountainScreen = () => {
   const { id: buildingId } = useLocalSearchParams();
 
   const [building, setBuilding] = useState<Building>();
+  const [fountainDescription, setFountainDescription] = useState("");
+  const [fountainFloor, setFountainFloor] = useState("0");
 
   const fetchBuilding = async (buildingId: string) => {
     try {
@@ -43,6 +47,10 @@ const CreateFountainScreen = () => {
   };
 
   useEffect(() => {
+    console.log(fountainDescription);
+  }, [fountainDescription]);
+
+  useEffect(() => {
     fetchBuilding(buildingId as string);
   }, [buildingId]);
 
@@ -59,8 +67,37 @@ const CreateFountainScreen = () => {
         <>
           <VStack className="space-y-1 mb-2">
             <Heading className="text-2xl text-center text-gray-900 font-bold">
-              {building.name}
+              New Fountain
             </Heading>
+            <HStack className="justify-center space-x-2">
+              <Text className="text-gray-600">{building.name}</Text>
+            </HStack>
+          </VStack>
+
+          <VStack className="space-y-2">
+            <VStack>
+              <Text className="text-gray-700 mb-2">Location</Text>
+              <Input>
+                <InputField
+                  testID="fountainLocationInput"
+                  placeholder="Enter a description of the fountain location"
+                  value={fountainDescription}
+                  onChangeText={setFountainDescription}
+                />
+              </Input>
+            </VStack>
+
+            <VStack>
+              <Text className="text-gray-700 mb-2">Floor</Text>
+              <Input>
+                <InputField
+                  testID="fountainFloorInput"
+                  placeholder="Enter the floor number"
+                  value={fountainFloor}
+                  onChangeText={setFountainFloor}
+                />
+              </Input>
+            </VStack>
           </VStack>
         </>
       )}
