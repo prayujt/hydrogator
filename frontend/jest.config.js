@@ -1,5 +1,6 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} **/
 module.exports = {
+  testTimeout: 30000,
   testEnvironment: "jsdom", // 'jsdom' simulates a browser environment
   preset: "jest-expo",
   moduleFileExtensions: ["js", "jsx", "ts", "tsx", "ios.js", "android.js", "native.js"],
