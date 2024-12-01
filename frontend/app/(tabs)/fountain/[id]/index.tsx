@@ -388,7 +388,7 @@ export default function WaterFountainDetail() {
                         </HStack>
                         <View className='w-full'>
                           {review.comment && (
-                            <Text className="text-gray-700 mt-2">
+                            <Text className="text-gray-700 mt-2 break-words">
                               {review.comment}
                             </Text>
                           )}

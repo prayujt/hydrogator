@@ -57,7 +57,7 @@ const MapScreen = () => {
   const snapPoints = useMemo(() => {
     if (selectedBuilding) {
       const contentLines = selectedBuilding.fountainCount;
-      const minSnapPoint = Math.min(35 + contentLines * 5, 50);
+      const minSnapPoint = Math.min(35 + contentLines * 5, 60);
       return [`${minSnapPoint}%`, "75%"];
     }
     return ["50%", "75%"];
@@ -121,7 +121,8 @@ const MapScreen = () => {
   };
 
   useEffect(() => {
-    const groups = buildingFountains.reduce((acc, fountain) => {
+    console.log(buildingFountains);
+    const groups = buildingFountains.reduce((acc: Record<number, Fountain[]>, fountain: Fountain) => {
       (acc[fountain.floor] = acc[fountain.floor] || []).push(fountain);
       return acc;
     }, {});
@@ -171,7 +172,7 @@ const MapScreen = () => {
         marker.getElement().addEventListener("click", async () => {
           console.log("Marker clicked:", building); // Debugging log
           setSelectedBuilding(building); // Open bottom sheet with this location data
-          await fetchFountains(building.id);
+          await fetchFountains(building.id.toString());
 
           const buildingLocation = [
             building.latitude,
@@ -245,47 +246,52 @@ const MapScreen = () => {
         geolocateControl.trigger();
 
         // Insert the layer beneath any existing labels.
-        const layers = map.getStyle().layers;
-        const labelLayerId = layers?.find(
-          (layer) => layer.type === "symbol" && layer.layout?.["text-field"]
-        )?.id;
+        // const layers = map.getStyle().layers;
+        const style = map.getStyle();
+        if (style && style.layers) {
+          const layers = style.layers;
+        
+          const labelLayerId = layers?.find(
+            (layer) => layer.type === "symbol" && layer.layout?.["text-field"]
+          )?.id;
 
-        // Add 3D buildings layer
-        map.addLayer(
-          {
-            id: "3d-buildings",
-            source: "composite",
-            "source-layer": "building",
-            filter: ["==", "extrude", "true"],
-            type: "fill-extrusion",
-            minzoom: 15,
-            paint: {
-              "fill-extrusion-color": "#aaa",
+          // Add 3D buildings layer
+          map.addLayer(
+            {
+              id: "3d-buildings",
+              source: "composite",
+              "source-layer": "building",
+              filter: ["==", "extrude", "true"],
+              type: "fill-extrusion",
+              minzoom: 15,
+              paint: {
+                "fill-extrusion-color": "#aaa",
 
-              // Use an 'interpolate' expression to add height based on zoom level
-              "fill-extrusion-height": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                15,
-                0,
-                15.05,
-                ["get", "height"],
-              ],
-              "fill-extrusion-base": [
-                "interpolate",
-                ["linear"],
-                ["zoom"],
-                15,
-                0,
-                15.05,
-                ["get", "min_height"],
-              ],
-              "fill-extrusion-opacity": 0.6,
+                // Use an 'interpolate' expression to add height based on zoom level
+                "fill-extrusion-height": [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  15,
+                  0,
+                  15.05,
+                  ["get", "height"],
+                ],
+                "fill-extrusion-base": [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  15,
+                  0,
+                  15.05,
+                  ["get", "min_height"],
+                ],
+                "fill-extrusion-opacity": 0.6,
+              },
             },
-          },
-          labelLayerId
-        );
+            labelLayerId
+          );
+        }
       });
 
       // Clean up on unmount
@@ -331,7 +337,7 @@ const MapScreen = () => {
               key={building.id}
               onPress={async () => {
                 setSelectedBuilding(building);
-                await fetchFountains(building.id);
+                await fetchFountains(building.id.toString());
 
                 const buildingLocation = [
                   building.latitude,
@@ -349,7 +355,7 @@ const MapScreen = () => {
               }}
             >
               <PointAnnotation
-                key={building.id}
+                key={building.id.toString()}
                 id={`marker-${building.id}`}
                 coordinate={[building.latitude, building.longitude]} // Note: longitude first, then latitude
               >
@@ -371,29 +377,31 @@ const MapScreen = () => {
           style={{ zIndex: 10 }}
         >
           <View className="items-center p-4 flex-1">
-            <Link
-              href={`/building/${selectedBuilding.id}/create-fountain`}
-              className="absolute top-1 left-5 p-1"
-            >
-              <View className="flex flex-row items-center justify-center gap-2">
+            <View className="flex flex-row items-center justify-between w-full mb-4">
+              {/* Link to create a new fountain */}
+              <Link
+                href={`/building/${selectedBuilding.id}/create-fountain`}
+                className="flex flex-row items-center pr-4 bg-blue-200 rounded-full"
+              >
                 <Button className="bg-blue-200 rounded-full justify-center items-center">
-                  <PlusCircle color="blue" size={20} />
+                  <PlusCircle color="blue" size={25} />
                 </Button>
-                <Text>New Fountain</Text>
-              </View>
-            </Link>
-            {/* Close Button */}
-            <Button
-              className="absolute top-4 right-4 p-1 bg-[#ff6347] w-[30px] h-[30px] rounded-full justify-center items-center"
-              onPress={() => setSelectedBuilding(null)}
-            >
-              <X color="white" size={20} />
-            </Button>
+                <Text className="font-semibold">New Fountain</Text>
+              </Link>
+
+              {/* Close button */}
+              <Button
+                className="p-1 bg-[#ff6347] w-[30px] h-[30px] rounded-full justify-center items-center"
+                onPress={() => setSelectedBuilding(null)}
+              >
+                <X color="white" size={20} />
+              </Button>
+            </View>
 
             {/* Building Name */}
             <Heading className="text-lg mb-4">{selectedBuilding.name}</Heading>
 
-            <ScrollView className="w-full">
+            <ScrollView className="flex-1 px-4 w-full">
               {Object.entries(groupedFountains).map(([floor, fountains]) => (
                 <View key={floor} className="w-full mb-4 px-2">
                   <Heading className="text-md mb-2">Floor {floor}</Heading>
@@ -428,7 +436,6 @@ const styles = StyleSheet.create({
     height: 30,
     alignItems: "center",
     justifyContent: "center",
-    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.3)", // Not supported in React Native
   },
   markerText: {
     color: "white",

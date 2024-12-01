@@ -75,18 +75,6 @@ export default function CreateReview() {
     setReview((prev) => ({ ...prev, [type]: rating }));
   };
 
-  const getFilterStatusGradient = (value: number) => {
-    // Create gradient colors based on the value (0-2)
-    if (value <= 1) {
-      // Red to Yellow gradient
-      return `bg-gradient-to-r from-red-500 via-yellow-500 to-green-500`;
-    } else if (value <= 2) {
-      // Yellow to Green gradient
-      return `bg-gradient-to-r from-red-500 via-yellow-500 to-green-500`;
-    }
-    return `bg-gradient-to-r from-red-500 via-yellow-500 to-green-500`;
-  };
-
   const getFilterStatusLabel = (value: number) => {
     if (value <= 0.67) return "Needs Replacement";
     if (value <= 1.33) return "OK";
@@ -211,13 +199,14 @@ export default function CreateReview() {
                         review.filterStatus
                       )}`}
                       style={{
-                        width: `${(review.filterStatus / 2) * 100}%`,
+                        width: `${Math.max((review.filterStatus / 2) * 100, 15)}%`, // Minimum width of 5%
+                        backgroundColor: review.filterStatus === 0 ? "#EF4444" : undefined, // Ensure red color for the lowest value
                       }}
                     />
                     <Slider
                       minimumValue={0}
                       maximumValue={2}
-                      step={0.5}
+                      step={1}
                       value={review.filterStatus}
                       onValueChange={(value) =>
                         setReview((prev) => ({
