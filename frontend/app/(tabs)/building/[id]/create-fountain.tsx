@@ -1,6 +1,6 @@
 import type { Building, Fountain } from "../../../../types";
 
-import { ScrollView, View } from "react-native";
+import { Platform, ScrollView, Switch, View } from "react-native";
 import { useEffect, useState } from "react";
 import { useRouter, useLocalSearchParams } from "expo-router";
 
@@ -23,6 +23,8 @@ const CreateFountainScreen = () => {
   const [building, setBuilding] = useState<Building>();
   const [fountainDescription, setFountainDescription] = useState("");
   const [fountainFloor, setFountainFloor] = useState("0");
+  const [fountainBottleFiller, setFountainBottleFiller] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchBuilding = async (buildingId: string) => {
     try {
@@ -46,9 +48,38 @@ const CreateFountainScreen = () => {
     }
   };
 
-  useEffect(() => {
-    console.log(fountainDescription);
-  }, [fountainDescription]);
+  const submitFountain = async () => {
+    try {
+      setIsSubmitting(true);
+      const token = await AsyncStorage.getItem("token");
+      if (!token) throw Error("No token found");
+
+      const response = await fetch(`${API_HOST}/fountains`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          buildingId,
+          description: fountainDescription,
+          longitude: building?.longitude,
+          latitude: building?.latitude,
+          hasBottleFiller: fountainBottleFiller,
+          floor: fountainFloor,
+        }),
+      });
+
+      if (!response.ok) throw Error("Failed to create fountain");
+      const newFountain: Fountain = await response.json();
+
+      router.push(`/fountain/${newFountain.id}`);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     fetchBuilding(buildingId as string);
@@ -74,7 +105,8 @@ const CreateFountainScreen = () => {
             </HStack>
           </VStack>
 
-          <VStack className="space-y-2">
+          <VStack className="space-y-4">
+            {/* Location */}
             <VStack>
               <Text className="text-gray-700 mb-2">Location</Text>
               <Input>
@@ -87,6 +119,7 @@ const CreateFountainScreen = () => {
               </Input>
             </VStack>
 
+            {/* Floor */}
             <VStack>
               <Text className="text-gray-700 mb-2">Floor</Text>
               <Input>
@@ -98,7 +131,53 @@ const CreateFountainScreen = () => {
                 />
               </Input>
             </VStack>
+
+            {/* Water Bottle Filler */}
+            <VStack className="space-y-2">
+              <Text className="text-gray-600 font-medium">
+                Water Bottle Filler
+              </Text>
+              <HStack className="items-center space-x-2">
+                <Text
+                  className={`text-sm ${
+                    !fountainBottleFiller ? "text-gray-900" : "text-gray-400"
+                  }`}
+                >
+                  No
+                </Text>
+                <Switch
+                  value={fountainBottleFiller}
+                  onValueChange={setFountainBottleFiller}
+                  trackColor={{ false: "#d1d5db", true: "#3b82f6" }} // gray-300 when off, blue-500 when on
+                  thumbColor={fountainBottleFiller ? "#1d4ed8" : "#9ca3af"} // Use blue-700 when on, gray-400 when off
+                  ios_backgroundColor="#d1d5db" // gray-300 background for iOS
+                  {...Platform.select({
+                    web: {
+                      activeThumbColor: "white",
+                    },
+                  })}
+                />
+                <Text
+                  className={`text-sm ${
+                    fountainBottleFiller ? "text-gray-900" : "text-gray-400"
+                  }`}
+                >
+                  Yes
+                </Text>
+              </HStack>
+            </VStack>
           </VStack>
+
+          {/* Submit Button */}
+          <Button
+            onPress={submitFountain}
+            disabled={isSubmitting}
+            className="py-3 rounded-lg mt-8"
+          >
+            <ButtonText className="text-white font-medium">
+              {isSubmitting ? "Creating..." : "Create Fountain"}
+            </ButtonText>
+          </Button>
         </>
       )}
     </ScrollView>
