@@ -371,7 +371,10 @@ const MapScreen = () => {
           style={{ zIndex: 10 }}
         >
           <View className="items-center p-4 flex-1">
-            <Link href="/create-fountain" className="absolute top-1 left-5 p-1">
+            <Link
+              href={`/building/${selectedBuilding.id}/create-fountain`}
+              className="absolute top-1 left-5 p-1"
+            >
               <View className="flex flex-row items-center justify-center gap-2">
                 <Button className="bg-blue-200 rounded-full justify-center items-center">
                   <PlusCircle color="blue" size={20} />

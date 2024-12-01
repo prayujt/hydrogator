@@ -109,7 +109,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="create-fountain"
+        name="building/[id]/create-fountain"
         options={{
           href: null,
         }}

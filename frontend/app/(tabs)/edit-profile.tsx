@@ -1,11 +1,10 @@
 // app/edit-profile.tsx
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "expo-router";
 import {
   View,
   Text,
-  TextInput,
-  Pressable,
   Alert,
   ScrollView,
   ActivityIndicator,
@@ -13,9 +12,9 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_HOST } from "../../constants/vars";
-import { Button, ButtonText } from "@/components/ui/button";
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
-import { EyeIcon, EyeOffIcon } from "lucide-react-native";
+import { ArrowLeftIcon, EyeIcon, EyeOffIcon } from "lucide-react-native";
 
 const showAlert = (title: string, message: string) => {
   if (Platform.OS === "web") {
@@ -42,6 +41,9 @@ export default function EditProfileScreen() {
   const [passwordError, setPasswordError] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false); // Toggle password visibility
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,20}$/;
+
+  const router = useRouter();
+
   const validatePassword = (text: string) => {
     // At least 8 characters, one uppercase letter, one lowercase letter, and one number
     if (!passwordRegex.test(text)) {
@@ -112,22 +114,24 @@ export default function EditProfileScreen() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${userToken}`,
+          Authorization: `Bearer ${userToken}`,
         },
         body: JSON.stringify(bodyData),
       });
 
-      
-    const { username, email, newPassword } = bodyData;
-    // Log each field's value
-    console.log("Username:", username);
-    if (username !== undefined && (typeof username !== "string" || username.trim() === "")) {
-      console.log("Bad");
-  } else{
-    console.log("Good")
-  }
-    console.log("Email:", email);
-    console.log("New Password:", newPassword);
+      const { username, email, newPassword } = bodyData;
+      // Log each field's value
+      console.log("Username:", username);
+      if (
+        username !== undefined &&
+        (typeof username !== "string" || username.trim() === "")
+      ) {
+        console.log("Bad");
+      } else {
+        console.log("Good");
+      }
+      console.log("Email:", email);
+      console.log("New Password:", newPassword);
 
       console.log(JSON.stringify(bodyData));
       // console.log(userToken);
@@ -162,6 +166,13 @@ export default function EditProfileScreen() {
 
   return (
     <ScrollView className="flex-1 bg-white px-6 py-4">
+      <View className="mr-auto bg-white px-6">
+        <Button variant="link" onPress={() => router.push("/account")}>
+          <ButtonIcon as={ArrowLeftIcon} className="h-5 w-5 text-gray-900" />
+          <ButtonText className="text-gray-900">Go Back</ButtonText>
+        </Button>
+      </View>
+
       <Text className="text-3xl font-bold mb-6 text-center">Edit Profile</Text>
 
       {loading && (
@@ -207,8 +218,6 @@ export default function EditProfileScreen() {
           Update Password
         </ButtonText>
       </Button>
-      
     </ScrollView>
   );
 }
-

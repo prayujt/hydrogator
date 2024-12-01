@@ -119,7 +119,6 @@ export default function CreateReview() {
       setIsSubmitting(true);
       const token = await AsyncStorage.getItem("token");
       if (!token) throw Error("No token found");
-      console.log(review, fountainId, token);
 
       const response = await fetch(
         `${API_HOST}/fountains/${fountainId}/reviews`,
@@ -191,9 +190,7 @@ export default function CreateReview() {
 
                 {/* Temperature Rating */}
                 <VStack>
-                  <Text className="text-gray-600 font-medium">
-                    Temperature
-                  </Text>
+                  <Text className="text-gray-600 font-medium">Temperature</Text>
                   {renderStarRating("temperature", review.temperature)}
                 </VStack>
 
@@ -205,7 +202,9 @@ export default function CreateReview() {
 
                 {/* Filter Status */}
                 <VStack className="space-y-2">
-                  <Text className="text-gray-600 font-medium">Filter Status</Text>
+                  <Text className="text-gray-600 font-medium">
+                    Filter Status
+                  </Text>
                   <View className="w-1/2">
                     <View
                       className={`h-3 rounded-full overflow-hidden ${getFilterStatusColor(
@@ -221,7 +220,10 @@ export default function CreateReview() {
                       step={0.5}
                       value={review.filterStatus}
                       onValueChange={(value) =>
-                        setReview((prev) => ({ ...prev, filterStatus: Math.floor(value) }))
+                        setReview((prev) => ({
+                          ...prev,
+                          filterStatus: Math.floor(value),
+                        }))
                       }
                       minimumTrackTintColor="transparent"
                       maximumTrackTintColor="transparent"
@@ -235,22 +237,47 @@ export default function CreateReview() {
 
                 {/* Water Bottle Filler */}
                 <VStack className="space-y-2">
-                  <Text className="text-gray-600 font-medium">Water Bottle Filler</Text>
+                  <Text className="text-gray-600 font-medium">
+                    Water Bottle Filler
+                  </Text>
                   <HStack className="items-center space-x-2">
-                    <Text className={`text-sm ${!review.hasBottleFiller ? 'text-gray-900' : 'text-gray-400'}`}>No</Text>
+                    <Text
+                      className={`text-sm ${
+                        !review.hasBottleFiller
+                          ? "text-gray-900"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      No
+                    </Text>
                     <Switch
                       value={review.hasBottleFiller}
                       onValueChange={(value) =>
-                        setReview((prev) => ({ ...prev, hasBottleFiller: value }))
+                        setReview((prev) => ({
+                          ...prev,
+                          hasBottleFiller: value,
+                        }))
                       }
-                      trackColor={{ false: '#d1d5db', true: '#3b82f6' }}  // gray-300 when off, blue-500 when on
-                      thumbColor={review.hasBottleFiller ? '#1d4ed8' : '#9ca3af'}  // Use blue-700 when on, gray-400 when off
-                      ios_backgroundColor="#d1d5db"  // gray-300 background for iOS
-                      {...Platform.select({web: {
-                        activeThumbColor: "white"
-                      }})}
+                      trackColor={{ false: "#d1d5db", true: "#3b82f6" }} // gray-300 when off, blue-500 when on
+                      thumbColor={
+                        review.hasBottleFiller ? "#1d4ed8" : "#9ca3af"
+                      } // Use blue-700 when on, gray-400 when off
+                      ios_backgroundColor="#d1d5db" // gray-300 background for iOS
+                      {...Platform.select({
+                        web: {
+                          activeThumbColor: "white",
+                        },
+                      })}
                     />
-                    <Text className={`text-sm ${review.hasBottleFiller ? 'text-gray-900' : 'text-gray-400'}`}>Yes</Text>
+                    <Text
+                      className={`text-sm ${
+                        review.hasBottleFiller
+                          ? "text-gray-900"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      Yes
+                    </Text>
                   </HStack>
                 </VStack>
 
@@ -273,7 +300,7 @@ export default function CreateReview() {
                       style={{
                         fontSize: 16,
                         lineHeight: 24,
-                        color: '#1F2937',
+                        color: "#1F2937",
                         height: 120,
                         minHeight: 120,
                         maxHeight: 200,
