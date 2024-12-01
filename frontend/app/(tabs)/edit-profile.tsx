@@ -166,7 +166,7 @@ export default function EditProfileScreen() {
 
   return (
     <ScrollView className="flex-1 bg-white px-6 py-4">
-      <View className="mr-auto bg-white px-6">
+      <View className="mr-auto bg-white px-6 pb-4">
         <Button variant="link" onPress={() => router.push("/account")}>
           <ButtonIcon as={ArrowLeftIcon} className="h-5 w-5 text-gray-900" />
           <ButtonText className="text-gray-900">Go Back</ButtonText>

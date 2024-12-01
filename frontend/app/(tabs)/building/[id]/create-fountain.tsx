@@ -6,7 +6,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { HStack } from "@/components/ui/hstack";
-import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { Input, InputField } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
 import { VStack } from "@/components/ui/vstack";
@@ -22,7 +22,7 @@ const CreateFountainScreen = () => {
 
   const [building, setBuilding] = useState<Building>();
   const [fountainDescription, setFountainDescription] = useState("");
-  const [fountainFloor, setFountainFloor] = useState("0");
+  const [fountainFloor, setFountainFloor] = useState("1");
   const [fountainBottleFiller, setFountainBottleFiller] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -50,6 +50,7 @@ const CreateFountainScreen = () => {
 
   const submitFountain = async () => {
     try {
+      if (!fountainDescription) return;
       setIsSubmitting(true);
       const token = await AsyncStorage.getItem("token");
       if (!token) throw Error("No token found");
@@ -66,12 +67,15 @@ const CreateFountainScreen = () => {
           longitude: building?.longitude,
           latitude: building?.latitude,
           hasBottleFiller: fountainBottleFiller,
-          floor: fountainFloor,
+          floor: parseInt(fountainFloor),
         }),
       });
 
       if (!response.ok) throw Error("Failed to create fountain");
       const newFountain: Fountain = await response.json();
+      setFountainDescription("");
+      setFountainFloor("1");
+      setFountainBottleFiller(false);
 
       router.push(`/fountain/${newFountain.id}`);
     } catch (error) {
@@ -87,7 +91,7 @@ const CreateFountainScreen = () => {
 
   return (
     <ScrollView className="flex-1 bg-white px-6 py-4">
-      <View className="mr-auto bg-white px-6">
+      <View className="mr-auto bg-white px-6 pb-4">
         <Button variant="link" onPress={() => router.push("/")}>
           <ButtonIcon as={ArrowLeftIcon} className="h-5 w-5 text-gray-900" />
           <ButtonText className="text-gray-900">Go Back</ButtonText>

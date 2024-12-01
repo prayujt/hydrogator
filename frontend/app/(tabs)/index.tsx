@@ -37,6 +37,9 @@ if (Platform.OS === "web") {
 const screenHeight = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
 
+const center: [number, number] = [-82.345, 29.645];
+const zoom = 15;
+
 const MapScreen = () => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<Mapbox.MapView | any>(null);
@@ -122,10 +125,13 @@ const MapScreen = () => {
 
   useEffect(() => {
     console.log(buildingFountains);
-    const groups = buildingFountains.reduce((acc: Record<number, Fountain[]>, fountain: Fountain) => {
-      (acc[fountain.floor] = acc[fountain.floor] || []).push(fountain);
-      return acc;
-    }, {});
+    const groups = buildingFountains.reduce(
+      (acc: Record<number, Fountain[]>, fountain: Fountain) => {
+        (acc[fountain.floor] = acc[fountain.floor] || []).push(fountain);
+        return acc;
+      },
+      {}
+    );
     setGroupedFountains(groups);
   }, [buildingFountains]);
 
@@ -133,8 +139,9 @@ const MapScreen = () => {
     if (!selectedBuilding && mapRef.current) {
       if (Platform.OS === "web")
         mapRef.current.easeTo({
-          pitch: 30,
-          zoom: 16,
+          center,
+          zoom,
+          pitch: 50,
           bearing: 0,
         });
     }
@@ -176,7 +183,7 @@ const MapScreen = () => {
 
           const buildingLocation = [
             building.latitude,
-            building.longitude - 0.00035,
+            building.longitude - 0.0015,
           ];
 
           mapRef.current.easeTo({
@@ -197,8 +204,8 @@ const MapScreen = () => {
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: "mapbox://styles/mapbox/streets-v12",
-        center: [-82.35, 29.645],
-        zoom: 16,
+        center,
+        zoom,
         pitch: 50,
         antialias: true,
       });
@@ -229,15 +236,15 @@ const MapScreen = () => {
         console.log("running geolocate");
         userLocationRef.current = [e.coords.longitude, e.coords.latitude];
         map.easeTo({
-          center: [-82.35, 29.645],
-          zoom: 16,
+          center,
+          zoom,
           pitch: 50,
         });
       });
 
       map.easeTo({
-        center: [-82.35, 29.645],
-        zoom: 16,
+        center,
+        zoom,
         pitch: 50,
       });
 
@@ -250,7 +257,7 @@ const MapScreen = () => {
         const style = map.getStyle();
         if (style && style.layers) {
           const layers = style.layers;
-        
+
           const labelLayerId = layers?.find(
             (layer) => layer.type === "symbol" && layer.layout?.["text-field"]
           )?.id;
@@ -326,8 +333,8 @@ const MapScreen = () => {
         >
           <Camera
             ref={cameraRef}
-            zoomLevel={16}
-            centerCoordinate={[-82.35, 29.645]}
+            zoomLevel={zoom}
+            centerCoordinate={center}
             pitch={50}
             animationMode="flyTo"
             animationDuration={1000}

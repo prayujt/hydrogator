@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
+import { View, ScrollView, Pressable, Switch, Platform } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ArrowLeftIcon } from "lucide-react-native";
-import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
-import { Text } from "@/components/ui/text";
-import { Heading } from "@/components/ui/heading";
-import { VStack } from "@/components/ui/vstack";
-import { HStack } from "@/components/ui/hstack";
-import { View, ScrollView, Pressable, Switch, Platform } from "react-native";
-import { API_HOST } from "@/constants/vars";
-import { Input, InputField } from "@/components/ui/input";
-import type { Fountain } from "../../../../types";
 import Slider from "@react-native-community/slider";
+
+import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
+import { HStack } from "@/components/ui/hstack";
+import { Text } from "@/components/ui/text";
+import { Textarea, TextareaInput } from "@/components/ui/textarea";
+import { VStack } from "@/components/ui/vstack";
+
+import { API_HOST } from "@/constants/vars";
+
+import type { Fountain } from "../../../../types";
 
 interface Review {
   id: string;
@@ -40,7 +43,7 @@ export default function CreateReview() {
     taste: 0,
     temperature: 0,
     flow: 0,
-    filterStatus: 1,
+    filterStatus: 2,
     hasBottleFiller: false,
     comment: "",
   });
@@ -199,8 +202,12 @@ export default function CreateReview() {
                         review.filterStatus
                       )}`}
                       style={{
-                        width: `${Math.max((review.filterStatus / 2) * 100, 15)}%`, // Minimum width of 5%
-                        backgroundColor: review.filterStatus === 0 ? "#EF4444" : undefined, // Ensure red color for the lowest value
+                        width: `${Math.max(
+                          (review.filterStatus / 2) * 100,
+                          10
+                        )}%`, // Minimum width of 10%
+                        backgroundColor:
+                          review.filterStatus === 0 ? "#EF4444" : undefined, // Ensure red color for the lowest value
                       }}
                     />
                     <Slider
@@ -224,78 +231,24 @@ export default function CreateReview() {
                   </View>
                 </VStack>
 
-                {/* Water Bottle Filler */}
-                <VStack className="space-y-2">
-                  <Text className="text-gray-600 font-medium">
-                    Water Bottle Filler
-                  </Text>
-                  <HStack className="items-center space-x-2">
-                    <Text
-                      className={`text-sm ${
-                        !review.hasBottleFiller
-                          ? "text-gray-900"
-                          : "text-gray-400"
-                      }`}
-                    >
-                      No
-                    </Text>
-                    <Switch
-                      value={review.hasBottleFiller}
-                      onValueChange={(value) =>
-                        setReview((prev) => ({
-                          ...prev,
-                          hasBottleFiller: value,
-                        }))
-                      }
-                      trackColor={{ false: "#d1d5db", true: "#3b82f6" }} // gray-300 when off, blue-500 when on
-                      thumbColor={
-                        review.hasBottleFiller ? "#1d4ed8" : "#9ca3af"
-                      } // Use blue-700 when on, gray-400 when off
-                      ios_backgroundColor="#d1d5db" // gray-300 background for iOS
-                      {...Platform.select({
-                        web: {
-                          activeThumbColor: "white",
-                        },
-                      })}
-                    />
-                    <Text
-                      className={`text-sm ${
-                        review.hasBottleFiller
-                          ? "text-gray-900"
-                          : "text-gray-400"
-                      }`}
-                    >
-                      Yes
-                    </Text>
-                  </HStack>
-                </VStack>
-
                 {/* Comment Input */}
                 <VStack className="space-y-2">
                   <Text className="text-gray-600 font-medium">Comment</Text>
-                  <Input>
-                    <InputField
-                      placeholder="Share your thoughts about this water fountain..."
-                      multiline
+                  <Textarea>
+                    <TextareaInput
+                      testID="reviewCommentInput"
+                      placeholder="Share any additional thoughts..."
                       value={review.comment}
-                      onChangeText={(text) =>
-                        setReview((prev) => ({ ...prev, comment: text }))
-                      }
-                      className="border border-gray-200 rounded-xl p-4 bg-white"
-                      textAlignVertical="top"
-                      placeholderTextColor="#9CA3AF"
                       numberOfLines={4}
                       maxLength={255}
-                      style={{
-                        fontSize: 16,
-                        lineHeight: 24,
-                        color: "#1F2937",
-                        height: 120,
-                        minHeight: 120,
-                        maxHeight: 200,
-                      }}
+                      onChangeText={(text) =>
+                        setReview((prev) => ({
+                          ...prev,
+                          comment: text,
+                        }))
+                      }
                     />
-                  </Input>
+                  </Textarea>
                 </VStack>
                 {/* Submit Button */}
                 <Button
