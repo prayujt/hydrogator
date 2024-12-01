@@ -409,6 +409,11 @@ const MapScreen = () => {
             <Heading className="text-lg mb-4">{selectedBuilding.name}</Heading>
 
             <ScrollView className="flex-1 px-4 w-full">
+              {selectedBuilding.fountainCount == 0 && (
+                <Text className="text-sm text-black mb-4 text-center">
+                  No fountains found in this building
+                </Text>
+              )}
               {Object.entries(groupedFountains).map(([floor, fountains]) => (
                 <View key={floor} className="w-full mb-4 px-2">
                   <Heading className="text-md mb-2">Floor {floor}</Heading>
