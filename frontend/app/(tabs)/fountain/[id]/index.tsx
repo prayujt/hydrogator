@@ -271,59 +271,67 @@ export default function WaterFountainDetail() {
                 <Text className="text-xl font-bold text-gray-900 mb-4">
                   Average Ratings
                 </Text>
-                <View className="flex-row flex-wrap justify-between">
-                  {/* Taste */}
-                  <View className="w-[48%] mb-6">
-                    <HStack className="items-center mb-2 space-x-2">
-                      <Star className="h-5 w-5 text-yellow-500" />
-                      <Text className="text-gray-600 font-medium">Taste</Text>
-                    </HStack>
-                    <Text className="text-2xl font-bold mb-1">
-                      {stats.avgTaste.toFixed(1)}
-                    </Text>
-                    {renderStars(stats.avgTaste)}
-                  </View>
+                {fountain.reviews.length == 0 && (
+                  <Text className="text-gray-500 text-center py-8">
+                    No reviews yet. Be the first to review!
+                  </Text>
+                )}
 
-                  {/* Temperature */}
-                  <View className="w-[48%] mb-6">
-                    <HStack className="items-center mb-2 space-x-2">
-                      <Thermometer className="h-5 w-5 text-blue-500" />
-                      <Text className="text-gray-600 font-medium">
-                        Temperature
+                {fountain.reviews.length > 0 && (
+                  <View className="flex-row flex-wrap justify-between">
+                    {/* Taste */}
+                    <View className="w-[48%] mb-6">
+                      <HStack className="items-center mb-2 space-x-2">
+                        <Star className="h-5 w-5 text-yellow-500" />
+                        <Text className="text-gray-600 font-medium">Taste</Text>
+                      </HStack>
+                      <Text className="text-2xl font-bold mb-1">
+                        {stats.avgTaste.toFixed(1)}
                       </Text>
-                    </HStack>
-                    <Text className="text-2xl font-bold mb-1">
-                      {stats.avgTemp.toFixed(1)}
-                    </Text>
-                    {renderStars(stats.avgTemp)}
-                  </View>
+                      {renderStars(stats.avgTaste)}
+                    </View>
 
-                  {/* Flow */}
-                  <View className="w-[48%] mb-6">
-                    <HStack className="items-center mb-2 space-x-2">
-                      <Droplet className="h-5 w-5 text-blue-500" />
-                      <Text className="text-gray-600 font-medium">Flow</Text>
-                    </HStack>
-                    <Text className="text-2xl font-bold mb-1">
-                      {stats.avgFlow.toFixed(1)}
-                    </Text>
-                    {renderStars(stats.avgFlow)}
-                  </View>
-
-                  {/* Filter Status */}
-                  <View className="w-[48%] mb-6 ">
-                    <HStack className="items-center mb-2 space-x-2">
-                      <Filter className="h-5 w-5 text-gray-500" />
-                      <Text className="text-gray-600 font-medium ">
-                        Filter Status
+                    {/* Temperature */}
+                    <View className="w-[48%] mb-6">
+                      <HStack className="items-center mb-2 space-x-2">
+                        <Thermometer className="h-5 w-5 text-blue-500" />
+                        <Text className="text-gray-600 font-medium">
+                          Temperature
+                        </Text>
+                      </HStack>
+                      <Text className="text-2xl font-bold mb-1">
+                        {stats.avgTemp.toFixed(1)}
                       </Text>
-                    </HStack>
-                    <Text className="text-2xl font-bold mb-1">
-                      {stats.avgFilterStatus.toFixed(1)}
-                    </Text>
-                    {getFilterStatusIcon(stats.avgFilterStatus)}
+                      {renderStars(stats.avgTemp)}
+                    </View>
+
+                    {/* Flow */}
+                    <View className="w-[48%] mb-6">
+                      <HStack className="items-center mb-2 space-x-2">
+                        <Droplet className="h-5 w-5 text-blue-500" />
+                        <Text className="text-gray-600 font-medium">Flow</Text>
+                      </HStack>
+                      <Text className="text-2xl font-bold mb-1">
+                        {stats.avgFlow.toFixed(1)}
+                      </Text>
+                      {renderStars(stats.avgFlow)}
+                    </View>
+
+                    {/* Filter Status */}
+                    <View className="w-[48%] mb-6 ">
+                      <HStack className="items-center mb-2 space-x-2">
+                        <Filter className="h-5 w-5 text-gray-500" />
+                        <Text className="text-gray-600 font-medium ">
+                          Filter Status
+                        </Text>
+                      </HStack>
+                      <Text className="text-2xl font-bold mb-1">
+                        {stats.avgFilterStatus.toFixed(1)}
+                      </Text>
+                      {getFilterStatusIcon(stats.avgFilterStatus)}
+                    </View>
                   </View>
-                </View>
+                )}
               </View>
 
               {/* Reviews Section */}
@@ -381,12 +389,12 @@ export default function WaterFountainDetail() {
                           </Text>
                           <View className="w-[48%] mb-6 ">
                             <View className="text-gray-600 flex-1 mb-2">
-                              Filter Status 
+                              Filter Status
                             </View>
                             {getFilterStatusIcon(review.filterStatus)}
                           </View>
                         </HStack>
-                        <View className='w-full'>
+                        <View className="w-full">
                           {review.comment && (
                             <Text className="text-gray-700 mt-2 break-words">
                               {review.comment}
