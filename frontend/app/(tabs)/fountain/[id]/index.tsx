@@ -19,6 +19,7 @@ import { API_HOST } from "@/constants/vars";
 import type { Fountain } from "../../../../types";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
+import { useReviewRefresh } from "@/context/ReviewContext"; 
 
 interface Review {
   id: string;
@@ -52,6 +53,8 @@ export default function WaterFountainDetail() {
     avgFlow: 0,
     avgFilterStatus: 0,
   });
+
+  const { shouldRefreshReview, resetReviewRefresh } = useReviewRefresh();
 
   const fetchFountain = async (fountainId: string) => {
     try {
@@ -109,6 +112,16 @@ export default function WaterFountainDetail() {
     }
   };
 
+  // Add an effect to handle map refreshing
+  useEffect(() => {
+    if (shouldRefreshReview) {
+      console.log("Refreshing reviews");
+      fetchFountain(fountainId as string);
+
+      resetReviewRefresh();
+    }
+  }, [shouldRefreshReview]);
+
   // Add animation value for heart press
   const scaleValue = new Animated.Value(1);
 
@@ -165,9 +178,9 @@ export default function WaterFountainDetail() {
   const getFilterStatusIcon = (status: number) => {
     const baseClasses = "w-full h-3 rounded-full overflow-hidden";
     const gradientClasses =
-      status === 3
+      status === 2
         ? "bg-gradient-to-r from-green-300 to-green-500"
-        : status === 2
+        : status === 1
         ? "bg-gradient-to-r from-yellow-300 to-yellow-500"
         : "bg-gradient-to-r from-red-300 to-red-500";
     return (
@@ -176,7 +189,7 @@ export default function WaterFountainDetail() {
           <View className={`${gradientClasses} h-full`} />
         </View>
         <Text className="text-center text-sm mt-1 text-gray-600">
-          {status === 3 ? "Good" : status === 2 ? "OK" : "Needs Replacement"}
+          {status === 2 ? "Good" : status === 1 ? "OK" : "Needs Replacement"}
         </Text>
       </View>
     );
@@ -311,16 +324,13 @@ export default function WaterFountainDetail() {
                   </View>
 
                   {/* Filter Status */}
-                  <View className="w-[48%] mb-6 ">
+                  <View className="w-[48%] mb-6">
                     <HStack className="items-center mb-2 space-x-2">
                       <Filter className="h-5 w-5 text-gray-500" />
                       <Text className="text-gray-600 font-medium ">
                         Filter Status
                       </Text>
                     </HStack>
-                    <Text className="text-2xl font-bold mb-1">
-                      {stats.avgFilterStatus.toFixed(1)}
-                    </Text>
                     {getFilterStatusIcon(stats.avgFilterStatus)}
                   </View>
                 </View>

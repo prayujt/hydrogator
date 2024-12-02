@@ -15,6 +15,7 @@ import { VStack } from "@/components/ui/vstack";
 import { API_HOST } from "@/constants/vars";
 
 import type { Fountain } from "../../../../types";
+import { useReviewRefresh } from "@/context/ReviewContext"; // Adjust the import path as needed
 
 interface Review {
   id: string;
@@ -38,7 +39,7 @@ export default function CreateReview() {
   const { id: fountainId } = useLocalSearchParams();
   const router = useRouter();
   const [fountain, setFountain] = useState<FountainWithReviews>();
-
+  const { triggerReviewRefresh } = useReviewRefresh();
   const [review, setReview] = useState({
     taste: 0,
     temperature: 0,
@@ -127,6 +128,8 @@ export default function CreateReview() {
       );
 
       if (!response.ok) throw Error("Failed to submit review");
+
+      triggerReviewRefresh();
 
       router.push(`/fountain/${fountainId}`);
     } catch (error) {
