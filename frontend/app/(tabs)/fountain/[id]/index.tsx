@@ -338,9 +338,6 @@ export default function WaterFountainDetail() {
                           Filter Status
                         </Text>
                       </HStack>
-                      <Text className="text-2xl font-bold mb-1">
-                        {stats.avgFilterStatus.toFixed(1)}
-                      </Text>
                       {getFilterStatusIcon(stats.avgFilterStatus)}
                     </View>
                   </View>
