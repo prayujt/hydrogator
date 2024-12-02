@@ -63,6 +63,8 @@ const MapScreen = () => {
   const [buildings, setBuildings] = useState<Building[]>([]);
   const [buildingFountains, setBuildingFountains] = useState<Fountain[]>([]);
 
+  const [notLoggedIn, setNotLoggedIn] = useState(false);
+
   const snapPoints = useMemo(() => {
     if (selectedBuilding) {
       const contentLines = selectedBuilding.fountainCount;
@@ -77,7 +79,9 @@ const MapScreen = () => {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
         // failed to retrieve token for request
-        throw Error("no token found");
+        setNotLoggedIn(true);
+        console.log("not logged in");
+        return;
       }
 
       const response = await fetch(
@@ -91,6 +95,11 @@ const MapScreen = () => {
         }
       );
 
+      if (!response.ok) {
+        console.log("not ok");
+        setNotLoggedIn(true);
+        return;
+      }
       setBuildingFountains(await response.json());
 
       if (!response.ok) {
@@ -104,17 +113,10 @@ const MapScreen = () => {
 
   const fetchBuildings = async () => {
     try {
-      const token = await AsyncStorage.getItem("token");
-      if (!token) {
-        // failed to retrieve token for request
-        throw Error("no token found");
-      }
-
       const response = await fetch(`${API_HOST}/buildings`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -167,7 +169,7 @@ const MapScreen = () => {
       resetMapRefresh();
     }
   }, [shouldRefreshMap]);
-  
+
   useEffect(() => {
     if (buildings.length === 0) return;
     if (!mapRef.current) return;
@@ -200,6 +202,7 @@ const MapScreen = () => {
         marker.getElement().addEventListener("click", async () => {
           // console.log("Marker clicked:", building); // Debugging log
           setSelectedBuilding(building); // Open bottom sheet with this location data
+          setNotLoggedIn(false);
           await fetchFountains(building.id.toString());
 
           const buildingLocation = [
@@ -364,6 +367,7 @@ const MapScreen = () => {
             <Pressable
               key={building.id}
               onPress={async () => {
+                setNotLoggedIn(false);
                 setSelectedBuilding(building);
                 await fetchFountains(building.id.toString());
 
@@ -428,8 +432,12 @@ const MapScreen = () => {
 
             {/* Building Name */}
             <Heading className="text-lg mb-4">{selectedBuilding.name}</Heading>
-
             <ScrollView className="flex-1 px-4 w-full">
+              {notLoggedIn && (
+                <Text className="text-sm text-black mb-4 text-center">
+                  You must be logged in to view fountains
+                </Text>
+              )}
               {selectedBuilding.fountainCount == 0 && (
                 <Text className="text-sm text-black mb-4 text-center">
                   No fountains found in this building
