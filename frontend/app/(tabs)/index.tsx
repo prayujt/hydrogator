@@ -388,7 +388,7 @@ const MapScreen = () => {
               {/* Link to create a new fountain */}
               <Link
                 href={`/building/${selectedBuilding.id}/create-fountain`}
-                className="flex flex-row items-center pr-4 bg-blue-200 rounded-full"
+                className="flex flex-row items-center pr-6 bg-blue-200 rounded-full"
               >
                 <Button className="bg-blue-200 rounded-full justify-center items-center">
                   <PlusCircle color="blue" size={25} />
