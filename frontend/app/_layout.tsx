@@ -4,6 +4,7 @@ import { Slot, useRouter } from "expo-router";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { useEffect, useState } from "react";
 import "@/global.css";
+import { MapDataProvider } from "@/context/MapDataContext"; // Adjust the import path as needed
 
 export default function RootLayout() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -16,8 +17,10 @@ export default function RootLayout() {
   }, [isLoggedIn]);
 
   return (
-    <GluestackUIProvider mode="light">
-      <Slot />
-    </GluestackUIProvider>
+    <MapDataProvider>
+      <GluestackUIProvider mode="light">
+        <Slot />
+      </GluestackUIProvider>
+    </MapDataProvider>
   );
 }

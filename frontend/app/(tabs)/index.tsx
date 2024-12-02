@@ -28,6 +28,9 @@ import mapboxgl from "mapbox-gl";
 import { API_HOST } from "@/constants/vars";
 import type { Fountain, Building } from "../../types";
 
+// Import the map data context
+import { useMapDataRefresh } from "@/context/MapDataContext"; // Adjust the import path as needed
+
 if (Platform.OS === "web") {
   mapboxgl.accessToken = process.env.EXPO_PUBLIC_RNMAPBOX_API_KEY as string;
 } else {
@@ -47,6 +50,9 @@ const MapScreen = () => {
   const userLocationRef = useRef<[number, number] | null>(null);
   const router = useRouter();
 
+  // Use the map data refresh context
+  const { shouldRefreshMap, resetMapRefresh } = useMapDataRefresh();
+
   // Bottom Sheet
   const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(
     null
@@ -61,7 +67,7 @@ const MapScreen = () => {
     if (selectedBuilding) {
       const contentLines = selectedBuilding.fountainCount;
       const minSnapPoint = Math.min(35 + contentLines * 5, 60);
-      return [`${minSnapPoint}%`, "75%"];
+      return [`${minSnapPoint}%`, "95%"];
     }
     return ["50%", "75%"];
   }, [selectedBuilding]);
@@ -117,6 +123,7 @@ const MapScreen = () => {
       if (!response.ok) {
         return;
       }
+      // console.log(buildings);
     } catch (error) {
       // Handle network or other errors
       console.error(error);
@@ -124,7 +131,7 @@ const MapScreen = () => {
   };
 
   useEffect(() => {
-    console.log(buildingFountains);
+    // console.log(buildingFountains);
     const groups = buildingFountains.reduce(
       (acc: Record<number, Fountain[]>, fountain: Fountain) => {
         (acc[fountain.floor] = acc[fountain.floor] || []).push(fountain);
@@ -147,6 +154,20 @@ const MapScreen = () => {
     }
   }, [selectedBuilding]);
 
+  // Add an effect to handle map refreshing
+  useEffect(() => {
+    if (shouldRefreshMap) {
+      console.log("Refreshing map data");
+      fetchBuildings();
+
+      if (selectedBuilding) {
+        fetchFountains(selectedBuilding.id.toString()); // Refresh fountains for the selected building
+      }
+
+      resetMapRefresh();
+    }
+  }, [shouldRefreshMap]);
+  
   useEffect(() => {
     if (buildings.length === 0) return;
     if (!mapRef.current) return;
@@ -177,7 +198,7 @@ const MapScreen = () => {
 
         // Add click event listener to the marker
         marker.getElement().addEventListener("click", async () => {
-          console.log("Marker clicked:", building); // Debugging log
+          // console.log("Marker clicked:", building); // Debugging log
           setSelectedBuilding(building); // Open bottom sheet with this location data
           await fetchFountains(building.id.toString());
 
@@ -200,7 +221,7 @@ const MapScreen = () => {
 
   useEffect(() => {
     if (mapContainerRef.current && Platform.OS === "web") {
-      console.log("container ref found");
+      // console.log("container ref found");
       const map = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: "mapbox://styles/mapbox/streets-v12",
@@ -233,7 +254,7 @@ const MapScreen = () => {
 
       // Store user's location when geolocated
       geolocateControl.on("geolocate", (e: any) => {
-        console.log("running geolocate");
+        // console.log("running geolocate");
         userLocationRef.current = [e.coords.longitude, e.coords.latitude];
         map.easeTo({
           center,
@@ -312,8 +333,8 @@ const MapScreen = () => {
   }, [mapContainerRef.current]);
 
   useEffect(() => {
-    console.log("running fetch again");
-    console.log(mapRef.current);
+    // console.log("running fetch again");
+    // console.log(mapRef.current);
     if (mapRef.current) fetchBuildings();
   }, [mapRef.current]);
 

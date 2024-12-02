@@ -16,9 +16,15 @@ import { ArrowLeftIcon } from "lucide-react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+// Import the map data context
+import { useMapDataRefresh } from "@/context/MapDataContext"; // Adjust the import path as needed
+
 const CreateFountainScreen = () => {
   const router = useRouter();
   const { id: buildingId } = useLocalSearchParams();
+
+  // Use the map data refresh context
+  const { triggerMapRefresh } = useMapDataRefresh();
 
   const [building, setBuilding] = useState<Building>();
   const [fountainDescription, setFountainDescription] = useState("");
@@ -73,6 +79,10 @@ const CreateFountainScreen = () => {
 
       if (!response.ok) throw Error("Failed to create fountain");
       const newFountain: Fountain = await response.json();
+      
+      // Trigger map refresh
+      triggerMapRefresh();
+      
       setFountainDescription("");
       setFountainFloor("1");
       setFountainBottleFiller(false);
