@@ -29,8 +29,8 @@ interface Review {
   flow: number;
   filterStatus: number;
   createdAt: string;
-  user: {
-    name: string;
+  user?: {
+    username: string;
   };
 }
 
@@ -380,7 +380,7 @@ export default function WaterFountainDetail() {
                     >
                       <HStack className="justify-between mb-2">
                         <Text className="text-gray-900">
-                          {review.user.username}
+                          {review.user?.username}
                         </Text>
                         <Text className="text-gray-500 text-sm">
                           {new Date(review.createdAt).toLocaleDateString()}
