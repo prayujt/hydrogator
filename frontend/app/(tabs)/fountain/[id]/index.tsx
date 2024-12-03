@@ -100,6 +100,7 @@ export default function WaterFountainDetail() {
             0
           ) / data.reviews.length;
 
+        console.log('Avg filter status: ', avgFilterStatus);
         setStats({
           avgTaste,
           avgTemp,
@@ -177,6 +178,7 @@ export default function WaterFountainDetail() {
 
   const getFilterStatusIcon = (status: number) => {
     const baseClasses = "w-full h-3 rounded-full overflow-hidden";
+    status = Math.round(status);
     const gradientClasses =
       status === 2
         ? "bg-gradient-to-r from-green-300 to-green-500"
@@ -397,7 +399,7 @@ export default function WaterFountainDetail() {
                           <Text className="text-gray-600 flex-1">
                             Flow {renderStars(review.flow)}
                           </Text>
-                          <View className="w-[48%] mb-6 ">
+                          <View className="flex-1 mb-6">
                             <View className="text-gray-600 flex-1 mb-2">
                               Filter Status
                             </View>
