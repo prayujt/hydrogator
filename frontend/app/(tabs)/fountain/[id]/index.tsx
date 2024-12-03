@@ -19,7 +19,7 @@ import { API_HOST } from "@/constants/vars";
 import type { Fountain } from "../../../../types";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
-import { useReviewRefresh } from "@/context/ReviewContext"; 
+import { useReviewRefresh } from "@/context/ReviewContext";
 
 interface Review {
   id: string;
@@ -100,7 +100,7 @@ export default function WaterFountainDetail() {
             0
           ) / data.reviews.length;
 
-        console.log('Avg filter status: ', avgFilterStatus);
+        console.log("Avg filter status: ", avgFilterStatus);
         setStats({
           avgTaste,
           avgTemp,
@@ -379,8 +379,8 @@ export default function WaterFountainDetail() {
                       } pb-4 mb-4`}
                     >
                       <HStack className="justify-between mb-2">
-                        <Text className="font-medium text-gray-900">
-                          {review.user?.name}
+                        <Text className="text-gray-900">
+                          {review.user.username}
                         </Text>
                         <Text className="text-gray-500 text-sm">
                           {new Date(review.createdAt).toLocaleDateString()}
